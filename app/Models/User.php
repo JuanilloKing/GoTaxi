@@ -23,6 +23,10 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function tipable() {
+        return $this->morphTo();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
