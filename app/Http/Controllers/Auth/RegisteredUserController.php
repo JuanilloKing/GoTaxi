@@ -33,6 +33,8 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        DB::beginTransaction();
+        try {
 
             // Validación de los datos
             $validated = $request->validate([
@@ -61,8 +63,14 @@ class RegisteredUserController extends Controller
                 //crear taxista
             }
             $user->save();  // Guardar la relación
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al registrar el usuario: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Error al registrar el usuario.']);
+        }
+        DB::commit();
 
-        return redirect()->route('dashboard')->with('success', 'Usuario registrado correctamente.');
+        return redirect()->to('/');
     }
    
 }

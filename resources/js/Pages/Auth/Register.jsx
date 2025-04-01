@@ -14,8 +14,7 @@ export default function Register() {
         telefono: '',
         email: '',
         password: '',
-        password_confirmation: '',
-        es_taxista: false,  
+        password_confirmation: '', 
         tipable_type: 'Cliente',  
     });
 
@@ -179,18 +178,6 @@ export default function Register() {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center">
-                    <input
-                        id="es_taxista"
-                        type="checkbox"
-                        checked={data.es_taxista}
-                        onChange={(e) => setData('es_taxista', e.target.checked)}
-                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                    />
-                    <label htmlFor="es_taxista" className="ml-2 text-sm text-gray-600">
-                        ¿Eres taxista?
-                    </label>
-                </div>
 
                 <div className="mt-4 flex items-center justify-end">
                     <Link
