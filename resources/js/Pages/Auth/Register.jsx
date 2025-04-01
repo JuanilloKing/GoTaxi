@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -6,16 +7,39 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+    const { data, setData, post, errors, reset } = useForm({
+        nombre: '',
+        apellidos: '',
+        dni: '',
+        telefono: '',
         email: '',
         password: '',
         password_confirmation: '',
+        es_taxista: false,  
+        tipable_type: 'Cliente',  
     });
+
+    const [dniError, setDniError] = useState('');
+
+    const validarDNI = (dni) => {
+        const dniRegex = /^(\d{8})([A-Z])$/i;
+        const match = dni.match(dniRegex);
+
+        if (!match) return false;
+
+        const numero = parseInt(match[1], 10);
+        const letra = match[2].toUpperCase();
+        const letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
+
+        return letras[numero % 23] === letra;
+    };
 
     const submit = (e) => {
         e.preventDefault();
-
+    
+        // Actualizamos el tipable_type según el estado del checkbox
+        setData('tipable_type', data.es_taxista ? 'Taxista' : 'Cliente');
+        
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
@@ -27,20 +51,73 @@ export default function Register() {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="nombre" value="Nombre" />
 
                     <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
+                        id="nombre"
+                        name="nombre"
+                        value={data.nombre}
                         className="mt-1 block w-full"
-                        autoComplete="name"
+                        autoComplete="nombre"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData('nombre', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.nombre} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="apellidos" value="Apellidos" />
+
+                    <TextInput
+                        id="apellidos"
+                        name="apellidos"
+                        value={data.apellidos}
+                        className="mt-1 block w-full"
+                        onChange={(e) => setData('apellidos', e.target.value)}
+                        required
+                    />
+                    <InputError message={errors.apellidos} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="dni" value="DNI" />
+
+                    <TextInput
+                        id="dni"
+                        name="dni"
+                        value={data.dni}
+                        className={`mt-1 block w-full ${dniError ? 'border-red-500' : ''}`}
+                        autoComplete="dni"
+                        onChange={(e) => setData('dni', e.target.value)}
+                        onBlur={() => {
+                            if (!validarDNI(data.dni)) {
+                                setDniError('El DNI no es válido');
+                            } else {
+                                setDniError('');
+                            }
+                        }}
+                        required
+                    />
+
+                    <InputError message={dniError || errors.dni} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="telefono" value="Teléfono" />
+
+                    <TextInput
+                        id="telefono"
+                        name="telefono"
+                        value={data.telefono}
+                        className="mt-1 block w-full"
+                        autoComplete="telefono"
+                        onChange={(e) => setData('telefono', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.telefono} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -61,7 +138,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="Contraseña" />
 
                     <TextInput
                         id="password"
@@ -80,7 +157,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirmar contraseña"
                     />
 
                     <TextInput
@@ -102,16 +179,29 @@ export default function Register() {
                     />
                 </div>
 
+                <div className="mt-4 flex items-center">
+                    <input
+                        id="es_taxista"
+                        type="checkbox"
+                        checked={data.es_taxista}
+                        onChange={(e) => setData('es_taxista', e.target.checked)}
+                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                    />
+                    <label htmlFor="es_taxista" className="ml-2 text-sm text-gray-600">
+                        ¿Eres taxista?
+                    </label>
+                </div>
+
                 <div className="mt-4 flex items-center justify-end">
                     <Link
                         href={route('login')}
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
-                        Already registered?
+                        ¿Ya registrado?
                     </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
+                    <PrimaryButton className="ms-4">
+                        Registrar
                     </PrimaryButton>
                 </div>
             </form>

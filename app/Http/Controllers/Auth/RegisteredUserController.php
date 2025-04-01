@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,22 +33,36 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            // Validación de los datos
+            $validated = $request->validate([
+                'nombre' => 'required|string|max:255',
+                'apellidos' => 'required|string|max:255',
+                'dni' => 'required|string|unique:users,dni',
+                'telefono' => 'required|string|unique:users,telefono',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|confirmed|min:8',
+            ]);
+                                                                                                                                   
+            $user = new User();
+            $user->nombre = $validated['nombre'];
+            $user->apellidos = $validated['apellidos'];
+            $user->dni = $validated['dni'];
+            $user->telefono = $validated['telefono'];
+            $user->email = $validated['email'];
+            $user->password = Hash::make($validated['password']);
+            // Asignar el ID del usuario al campo tipable_id
+            if ($request->tipable_type === 'Cliente') {
+                // Crear el cliente
+                $cliente = new Cliente();
+                $cliente->save();
+                $user->tipable()->associate($cliente);  // Asociar el usuario con el cliente o taxista
+            } else {
+                //crear taxista
+            }
+            $user->save();  // Guardar la relación
 
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('dashboard')->with('success', 'Usuario registrado correctamente.');
     }
+   
 }
