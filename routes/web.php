@@ -30,5 +30,8 @@ Route::middleware('auth')->get('/reservar', function () {
     return Inertia::render('Reservar/Create');
 });
 
+Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('taxista.create');
+
+
 
 require __DIR__.'/auth.php';

@@ -4,6 +4,8 @@ import ResponsiveNavLink from './ResponsiveNavLink'
 import NavLink from './NavLink'
 
 export default function Header({ isLoggedIn }) {
+  const isTaxista = isLoggedIn && window.user?.tipable_type === 'App\\Models\\Taxista';
+
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
       <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -13,11 +15,19 @@ export default function Header({ isLoggedIn }) {
 
       <nav className="flex space-x-4">
         <NavLink href={isLoggedIn ? '/reservar' : '/register'}>
-        Reservar taxi
+          Reservar taxi
         </NavLink>
+        {!isLoggedIn && (
+          <NavLink href="/login"></NavLink>
+        )}
+        {!isLoggedIn && (
+        <NavLink href={isLoggedIn ? '/taxistas' : '/registrar-taxista'}>
+          Taxistas
+          </NavLink>
+          )}
         {isLoggedIn && (
           <Link
-            href="/logout" // Luego lo puedes conectar bien con tu logout real
+            href="/logout"
             method="post"
             as="button"
             className="text-red-600 hover:underline font-semibold"

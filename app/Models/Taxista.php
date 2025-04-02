@@ -13,4 +13,8 @@ class Taxista extends Model
     public function users() {
         return $this->morphOne(User::class, 'tipable');
     }
+
+    public function vehiculo() {
+        return $this->belongsTo(Vehiculo::class);
+    }
 }

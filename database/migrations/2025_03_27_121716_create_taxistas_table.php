@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('taxistas', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('vehiculo_id'); 
+            $table->foreign('vehiculo_id')->references('id')->on('vehiculos');
+            $table->timestamp('ultimo_viaje')->nullable();
+            $table->string('ciudad');
             $table->timestamps();
         });
     }

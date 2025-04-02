@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Taxista;
+use App\Models\Vehiculo;
 use Illuminate\Http\Request;
 
-class TaxistaController extends Controller
+class VehiculoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,7 +20,7 @@ class TaxistaController extends Controller
      */
     public function create()
     {
-        return inertia('RegisterTaxista');
+        //
     }
 
     /**
@@ -28,13 +28,13 @@ class TaxistaController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Taxista $taxista)
+    public function show(Vehiculo $vehiculo)
     {
         //
     }
@@ -42,7 +42,7 @@ class TaxistaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Taxista $taxista)
+    public function edit(Vehiculo $vehiculo)
     {
         //
     }
@@ -50,7 +50,7 @@ class TaxistaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Taxista $taxista)
+    public function update(Request $request, Vehiculo $vehiculo)
     {
         //
     }
@@ -58,7 +58,7 @@ class TaxistaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Taxista $taxista)
+    public function destroy(Vehiculo $vehiculo)
     {
         //
     }

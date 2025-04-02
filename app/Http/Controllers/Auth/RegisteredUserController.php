@@ -70,6 +70,10 @@ class RegisteredUserController extends Controller
         }
         DB::commit();
 
+        event(new Registered($user));
+        Auth::login($user);
+
+
         return redirect()->to('/');
     }
    
