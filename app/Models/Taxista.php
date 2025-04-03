@@ -17,4 +17,10 @@ class Taxista extends Model
     public function vehiculo() {
         return $this->belongsTo(Vehiculo::class);
     }
+
+    protected $fillable = [
+        'vehiculo_id',
+        'ciudad',
+        'ultimo_viaje', 
+    ];
 }

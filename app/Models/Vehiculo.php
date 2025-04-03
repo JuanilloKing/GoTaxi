@@ -14,4 +14,15 @@ class Vehiculo extends Model
     {
         return $this->hasMany(Taxista::class);
     }
+
+    protected $fillable = [
+        'licencia_taxi',
+        'matricula',
+        'marca',
+        'modelo',
+        'estado',
+        'color',
+        'minusvalido',
+        'capacidad',
+    ];
 }

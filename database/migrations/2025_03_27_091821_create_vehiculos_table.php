@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('licencia_taxi')->unique();
             $table->string('matricula')->unique();
             $table->string('marca');
-            $table->string('estado')->default('no disponible');
             $table->string('modelo');
+            $table->string('estado')->default('no disponible');
             $table->string('color');
             $table->boolean('minusvalido');
             $table->string('capacidad');

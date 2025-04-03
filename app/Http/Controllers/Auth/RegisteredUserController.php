@@ -54,14 +54,10 @@ class RegisteredUserController extends Controller
             $user->email = $validated['email'];
             $user->password = Hash::make($validated['password']);
             // Asignar el ID del usuario al campo tipable_id
-            if ($request->tipable_type === 'Cliente') {
                 // Crear el cliente
                 $cliente = new Cliente();
                 $cliente->save();
-                $user->tipable()->associate($cliente);  // Asociar el usuario con el cliente o taxista
-            } else {
-                //crear taxista
-            }
+                $user->tipable()->associate($cliente);
             $user->save();  // Guardar la relación
         } catch (\Exception $e) {
             DB::rollBack();

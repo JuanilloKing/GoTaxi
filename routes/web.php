@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaxistaController;
 use Illuminate\Foundation\Application;
@@ -30,8 +29,7 @@ Route::middleware('auth')->get('/reservar', function () {
     return Inertia::render('Reservar/Create');
 });
 
-Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('taxista.create');
-
-
+Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('registrar-taxista.create');
+Route::post('/registrar-taxista', [TaxistaController::class, 'store'])->name('registrar-taxista.store');
 
 require __DIR__.'/auth.php';
