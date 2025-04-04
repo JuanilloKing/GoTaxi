@@ -14,8 +14,13 @@ export default function UpdateProfileInformation({
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
+            nombre: user.nombre,
+            apellidos: user.apellidos || '',  // Agregado para los apellidos
             email: user.email,
+            dni: user.dni || '',  // Agregado para el DNI
+            telefono: user.telefono || '',  // Agregado para el teléfono
+            password: '',  // Agregado para la contraseña
+            password_confirmation: '',  // Confirmación de la contraseña
         });
 
     const submit = (e) => {
@@ -28,31 +33,49 @@ export default function UpdateProfileInformation({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
+                    Perfil
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                    Cambia los siguientes datos para actualizar tu perfil.
                 </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                {/* Nombre */}
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="nombre" value="Nombre" />
 
                     <TextInput
-                        id="name"
+                        id="nombre"
                         className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
+                        value={data.nombre}
+                        onChange={(e) => setData('nombre', e.target.value)}
                         required
                         isFocused
-                        autoComplete="name"
+                        autoComplete="nombre"
                     />
 
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors.nombre} />
                 </div>
 
+                {/* Apellidos */}
+                <div>
+                    <InputLabel htmlFor="apellidos" value="apellidos" />
+
+                    <TextInput
+                        id="apellidos"
+                        className="mt-1 block w-full"
+                        value={data.apellidos}
+                        onChange={(e) => setData('apellidos', e.target.value)}
+                        required
+                        autoComplete="family-nombre"
+                    />
+
+                    <InputError className="mt-2" message={errors.apellidos} />
+                </div>
+
+                {/* Email */}
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
@@ -67,6 +90,68 @@ export default function UpdateProfileInformation({
                     />
 
                     <InputError className="mt-2" message={errors.email} />
+                </div>
+
+                {/* DNI */}
+                <div>
+                    <InputLabel htmlFor="dni" value="DNI" />
+
+                    <TextInput
+                        id="dni"
+                        className="mt-1 block w-full"
+                        value={data.dni}
+                        onChange={(e) => setData('dni', e.target.value)}
+                        required
+                    />
+
+                    <InputError className="mt-2" message={errors.dni} />
+                </div>
+
+                {/* Teléfono */}
+                <div>
+                    <InputLabel htmlFor="telefono" value="Teléfono" />
+
+                    <TextInput
+                        id="telefono"
+                        className="mt-1 block w-full"
+                        value={data.telefono}
+                        onChange={(e) => setData('telefono', e.target.value)}
+                        required
+                    />
+
+                    <InputError className="mt-2" message={errors.telefono} />
+                </div>
+
+                {/* Contraseña */}
+                <div>
+                    <InputLabel htmlFor="password" value="Password" />
+
+                    <TextInput
+                        id="password"
+                        type="password"
+                        className="mt-1 block w-full"
+                        value={data.password}
+                        onChange={(e) => setData('password', e.target.value)}
+                        autoComplete="new-password"
+                    />
+
+                    <InputError className="mt-2" message={errors.password} />
+                </div>
+
+                {/* Confirmación de la contraseña */}
+                <div>
+                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+
+                    <TextInput
+                        id="password_confirmation"
+                        type="password"
+                        className="mt-1 block w-full"
+                        value={data.password_confirmation}
+                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                        autoComplete="new-password"
+                    />
+
+                    <InputError className="mt-2" message={errors.password_confirmation} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
