@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react'
 import { Link } from '@inertiajs/react'
 import ResponsiveNavLink from './ResponsiveNavLink'
@@ -16,6 +17,10 @@ export default function Header({ isLoggedIn }) {
   const closeDropdown = () => {
     setIsDropdownOpen(false)
   }
+
+  const { auth } = usePage().props;
+  const user = auth.user;
+  
 
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
@@ -37,7 +42,7 @@ export default function Header({ isLoggedIn }) {
           </NavLink>
         )}
 
-        {isLoggedIn && (
+        {isLoggedIn && user.tipable_type === 'App\\Models\\Cliente' && (
           <div className="relative">
             <button onClick={toggleDropdown} className="flex items-center gap-2">
               <span role="img" aria-label="user" className="text-xl">
