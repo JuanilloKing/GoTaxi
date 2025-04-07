@@ -23,6 +23,9 @@ const Mapa = () => {
   const [routeCoords, setRouteCoords] = useState([]);
   const [mapInstance, setMapInstance] = useState(null);
   const [center, setCenter] = useState([36.5, -6.0]);
+  const [distancia, setDistancia] = useState(null);
+  const [duracion, setDuracion] = useState(null);
+
 
   const ORS_API_KEY = '5b3ce3597851110001cf624878a88a9cc2d446f2a7c8e36785ec54df';
 
@@ -64,7 +67,7 @@ const Mapa = () => {
         [to[1], to[0]],
       ],
     };
-
+  
     const res = await fetch(
       'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
       {
@@ -76,14 +79,22 @@ const Mapa = () => {
         body: JSON.stringify(body),
       }
     );
-
+  
     const data = await res.json();
     const coords = data.features[0].geometry.coordinates.map(([lng, lat]) => [
       lat,
       lng,
     ]);
     setRouteCoords(coords);
+  
+    const resumen = data.features[0].properties.summary;
+    const km = (resumen.distance / 1000).toFixed(2);       // metros → km
+    const min = Math.ceil(resumen.duration / 60);           // segundos → minutos
+  
+    setDistancia(km);
+    setDuracion(min);
   };
+  
 
   useEffect(() => {
     if (marker1 && marker2) {
@@ -104,14 +115,22 @@ const Mapa = () => {
 
   const RutaOverlay = () => {
     if (!mapInstance || routeCoords.length === 0) return null;
+  
     const points = routeCoords
       .map(([lat, lng]) => {
-        const { x, y } = mapInstance.latLngToPixel({ lat, lng });
-        return `${x},${y}`;
+        const pixel = mapInstance.latLngToPixel({ lat, lng });
+        return pixel ? `${pixel.x},${pixel.y}` : null;
       })
+      .filter(Boolean)
       .join(' ');
+  
     return (
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+      <svg
+        className="pointer-events-none absolute top-0 left-0"
+        width="100%"
+        height="500"
+        style={{ zIndex: 50 }}
+      >
         <polyline
           points={points}
           fill="none"
@@ -123,6 +142,7 @@ const Mapa = () => {
       </svg>
     );
   };
+  
 
   return (
     <div className="space-y-4 relative">
@@ -188,19 +208,28 @@ const Mapa = () => {
 
       {/* Mapa */}
       <div className="relative h-[500px] w-full">
-        <Map
-          center={center}
-          zoom={6}
-          height={500}
-          width={800}
-          ref={setMapInstance}
-        >
+          <Map
+            center={center}
+            zoom={6}
+            height={500}
+            width={800}
+            ref={(ref) => {
+              if (ref && !mapInstance) setMapInstance(ref);
+            }}
+          >
           {marker1 && <Marker anchor={marker1} />}
           {marker2 && <Marker anchor={marker2} />}
           <ZoomControl />
         </Map>
         <RutaOverlay />
       </div>
+      {distancia && duracion && (
+  <div className="mt-4 text-lg font-semibold text-gray-800">
+    Distancia estimada: {distancia} km <br />
+    Duración estimada: {duracion} minutos
+  </div>
+)}
+
     </div>
   );
 };
