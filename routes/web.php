@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservarController;
 use App\Http\Controllers\TaxistaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,9 @@ Route::middleware('auth')->get('/reservar', function () {
 
 Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('registrar-taxista.create');
 Route::post('/registrar-taxista', [TaxistaController::class, 'store'])->name('registrar-taxista.store');
+
+Route::post('/reservar', [ReservarController::class, 'store'])->name('reservar.store');
+
 
 // routes/web.php
 

@@ -6,6 +6,8 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
+// Importa el MapaProvider
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -18,9 +20,13 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        // Envuelve la aplicación con el MapaProvider
+        root.render(
+                <App {...props} />
+        );
     },
     progress: {
         color: '#4B5563',
     },
 });
+
