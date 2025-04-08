@@ -12,7 +12,8 @@ class ReservarController extends Controller
     public function store(Request $request)
     {
          $user = User::findOrFail(Auth::user()->id);
-
+         
+         dd($request->all());
         $request->validate([
             'fecha_reserva'    => 'required|date',
             'fecha_recogida'   => 'required|date|after_or_equal:fecha_reserva',
@@ -26,9 +27,10 @@ class ReservarController extends Controller
             'minusvalido'      => 'required|boolean',
         ]);
 
+
         $reserva = Reserva::create([
             'cliente_id'     => $user->id,
-            'taxista_id'     => $que, // Asignar taxista_id, el disponible que lleve mas tiempo inactivo.
+            'taxista_id'     => $user, 
             'fecha_reserva'  => $request->fecha_reserva,
             'fecha_recogida' => $request->fecha_recogida,
             'fecha_entrega'  => $request->fecha_entrega,
