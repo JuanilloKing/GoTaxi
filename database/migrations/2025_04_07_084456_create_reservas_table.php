@@ -18,12 +18,12 @@ return new class extends Migration
             $table->timestamp('fecha_reserva');
             $table->timestamp('fecha_recogida');
             $table->timestamp('fecha_entrega')->nullable();
+            $table->foreignId('estado_id')->constrained();
             $table->string('origen');
             $table->string('destino');
             $table->string('num_pasajeros');
             $table->string('distancia');
             $table->string('precio');
-            $table->string('estado')->default('pendiente');
             $table->boolean('minusvalido');
             $table->timestamps();
         });

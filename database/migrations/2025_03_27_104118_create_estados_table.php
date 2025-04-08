@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('taxistas', function (Blueprint $table) {
+        Schema::create('estados', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('vehiculo_id'); 
-            $table->foreign('vehiculo_id')->references('id')->on('vehiculos');
-            $table->timestamp('ultimo_viaje')->nullable();
-            $table->string('ciudad');
-            $table->foreignId('estado_id')->constrained('estados')->nullable();
+            $table->string('estado')->unique();
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taxistas');
+        Schema::dropIfExists('estados');
     }
 };

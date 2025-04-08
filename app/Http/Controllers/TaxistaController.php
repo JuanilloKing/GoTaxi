@@ -59,7 +59,7 @@ class TaxistaController extends Controller
             $vehiculo->minusvalido = $validated['minusvalido'];
             $vehiculo->capacidad = $validated['capacidad'];
             $vehiculo->save();
-                                                                           
+                                      
             $user = new User();
             $user->nombre = $validated['nombre'];
             $user->apellidos = $validated['apellidos'];
@@ -71,6 +71,7 @@ class TaxistaController extends Controller
                 $Taxista = new Taxista();
                 $Taxista->ciudad = $validated['ciudad'];
                 $Taxista->vehiculo_id = $vehiculo->id;
+                $Taxista->estado_id = 2; 
                 $Taxista->save();
                 $user->tipable()->associate($Taxista);  // Asociar el usuario con el Taxista o taxista
             $user->save();  // Guardar la relación
