@@ -35,10 +35,12 @@ const Create = () => {
   const { data, setData, post, processing } = useForm({
     origen: search1,
     destino: search2,
-    distancia: distancia,
-    duracion: duracion,
-    taxi_minusvalido: false, // Valor por defecto cuando el checkbox no está marcado
-    anotaciones: '' // Valor por defecto para las anotaciones
+    distancia: Number(distancia),
+    duracion: Number(duracion),
+    precio: Number(((distancia * tarifa_km) + (duracion * tarifa_min)).toFixed(2)),
+    minusvalido: false, // Valor por defecto cuando el checkbox no está marcado
+    anotaciones: '', // Valor por defecto para las anotaciones
+    pasajeros: 0, // Valor por defecto para el número de pasajeros
   });
 
   // Manejar el envío del formulario con FormData
@@ -51,13 +53,13 @@ const Create = () => {
     formData.append('destino', search2);
     formData.append('distancia', distancia);
     formData.append('duracion', duracion);
+    formData.append('precio', ((distancia * tarifa_km) + (duracion * tarifa_min)).toFixed(2));
     formData.append('anotaciones', data.anotaciones); // Si tienes un campo de anotaciones
-    formData.append('taxi_minusvalido', data.taxi_minusvalido); // Checkbox: verdadero o falso
-
+    formData.append('minusvalido', data.minusvalido); // Checkbox: verdadero o falso
+    formData.append('pasajeros', data.pasajeros); // Número de pasajeros
+ 
     // Usar post para enviar los datos con FormData
-    router.post(route('reservar.store'), formData, {
-
-    });
+    router.post(route('reservar.store'), formData, {});
   };
 
   const ORS_API_KEY = '5b3ce3597851110001cf624878a88a9cc2d446f2a7c8e36785ec54df';
@@ -177,8 +179,12 @@ const Create = () => {
 
   // Función para manejar el cambio del checkbox
   const handleCheckboxChange = (e) => {
-    setData('taxi_minusvalido', e.target.checked); // Cambia el valor de 'taxi_minusvalido'
+    setData('minusvalido', e.target.checked); // Cambia el valor de 'minusvalido'
   };
+
+
+
+
 
   return (
     <div>
@@ -200,6 +206,7 @@ const Create = () => {
                   }}
                   placeholder="Origen..."
                   className="border p-2 rounded w-64"
+                  required
                 />
                 {showSuggestions1 && results1.length > 0 && (
                   <ul className="absolute bg-white border w-64 shadow z-50 mt-1 max-h-60 overflow-y-auto">
@@ -229,6 +236,7 @@ const Create = () => {
                   }}
                   placeholder="Destino..."
                   className="border p-2 rounded w-64"
+                  required
                 />
                 {showSuggestions2 && results2.length > 0 && (
                   <ul className="absolute bg-white border w-64 shadow z-50 mt-1 max-h-60 overflow-y-auto">
@@ -284,11 +292,23 @@ const Create = () => {
                 <input 
                   type="checkbox" 
                   className="form-checkbox" 
-                  checked={data.taxi_minusvalido} 
+                  checked={data.minusvalido} 
                   onChange={handleCheckboxChange} 
                 />
                 <span>Taxi minusválido</span>
               </label>
+            </div>
+            <div>
+              <label className="block mb-2">Número de pasajeros:</label>
+              <input
+                type="number"
+                className="border p-2 rounded w-full"
+                min="1"
+                max="8"
+                placeholder="Introduce el número de pasajeros"
+                onChange={(e) => setData('pasajeros', e.target.value)}
+                required
+              />
             </div>
             <div>
               <label className="block mb-2">Anotaciones para el taxista:</label>
@@ -299,19 +319,24 @@ const Create = () => {
                 onChange={(e) => setData('anotaciones', e.target.value)}
               ></textarea>
             </div>
-            <div className="flex justify-between mt-4">
+            {distancia && duracion && (
+
+              <div className="flex justify-between mt-4">
               <button
                 type="submit"
                 disabled={processing}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
                 Reservar taxi ahora
               </button>
               <button
                 type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
                 Programar fecha y hora del taxi
               </button>
             </div>
+              )}
           </form>
         </div>
       </div>

@@ -20,6 +20,7 @@ class Reserva extends Model
         'destino',
         'num_pasajeros',
         'distancia',
+        'anotaciones',
         'precio',
         'estado',
         'minusvalido',

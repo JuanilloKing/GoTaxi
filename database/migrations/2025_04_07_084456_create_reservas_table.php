@@ -16,12 +16,13 @@ return new class extends Migration
             $table->foreignId('cliente_id')->constrained();
             $table->foreignId('taxista_id')->constrained();
             $table->timestamp('fecha_reserva');
-            $table->timestamp('fecha_recogida');
+            $table->timestamp('fecha_recogida');            //es la misma que fecha reserva si se pide para recoger en el momento
             $table->timestamp('fecha_entrega')->nullable();
             $table->foreignId('estado_id')->constrained();
             $table->string('origen');
             $table->string('destino');
             $table->string('num_pasajeros');
+            $table->string('anotaciones')->nullable();
             $table->string('distancia');
             $table->string('precio');
             $table->boolean('minusvalido');
