@@ -35,34 +35,38 @@ const RegisterTaxista = () => {
     capacidad: '',
     minusvalido: false,
   });
-
+  // Estado para el autocompletado de la ciudad
   const [search, setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  const API_KEY = "3b3471c7f4ec44afa8588b257cc362d8"; // Tu API Key de Geoapify
+
+  // Lógica de debounce para el campo de búsqueda
   const debouncedSearch = useDebounce(search, 500); // Para evitar hacer demasiadas peticiones mientras el usuario escribe
 
   useEffect(() => {
     if (debouncedSearch.length >= 2) {
-      fetchCitySuggestions(debouncedSearch); // Llamada a la API de OpenStreetMap
+      fetchCitySuggestions(debouncedSearch); // Llamada a la API de Geoapify
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
     }
   }, [debouncedSearch]);
 
+  // Función para obtener las sugerencias de ciudades
   const fetchCitySuggestions = async (query) => {
     const res = await fetch(
-    `https://corsproxy.io/?https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ES&limit=5&featuretype=city`
+      `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(query)}&type=city&limit=5&countrycode=ES&apiKey=${API_KEY}`
     );
     const data = await res.json();
-    setSuggestions(data);
+    setSuggestions(data.features);
     setShowSuggestions(true);
   };
 
   const handleSelectCity = (place) => {
-    setSearch(place.display_name);  // Coloca la ciudad seleccionada en el campo de texto
-    setData('ciudad', place.display_name);  // Actualiza el estado con la ciudad seleccionada
+    setSearch(place.properties.city);  // Coloca la ciudad seleccionada en el campo de texto
+    setData('ciudad', place.properties.city);  // Actualiza el estado con la ciudad seleccionada
     setSuggestions([]);  // Limpiar las sugerencias
     setShowSuggestions(false);  // Ocultar las sugerencias
   };
@@ -76,7 +80,6 @@ const RegisterTaxista = () => {
     e.preventDefault();
     post(route('registrar-taxista.store'));  // Envia los datos al backend a la ruta 'registrar-taxista.store'
   };
-
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -188,14 +191,13 @@ const RegisterTaxista = () => {
 
                     <div className="mt-4">
                         <InputLabel htmlFor="ciudad" value="Ciudad" />
-                        <TextInput
-                        id="ciudad"
+                        <input
                         type="text"
-                        name="ciudad"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}  // Actualiza el valor del campo al escribir
                         required
                         className="mt-1 block w-full"
+                        placeholder="Introduce una ciudad"
                         />
                         <InputError message={errors.ciudad} className="mt-2" />
 
@@ -208,7 +210,7 @@ const RegisterTaxista = () => {
                                 onClick={() => handleSelectCity(place)}
                                 className="p-2 hover:bg-gray-100 cursor-pointer"
                             >
-                                {place.display_name}
+                                {place.properties.city}
                             </li>
                             ))}
                         </ul>

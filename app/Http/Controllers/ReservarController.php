@@ -12,6 +12,7 @@ class ReservarController extends Controller
 {
     public function store(Request $request)
     {
+        dd($request->all());
          $user = User::findOrFail(Auth::user()->id);
 
          $request->merge([
@@ -38,16 +39,16 @@ class ReservarController extends Controller
             //'estado'           => 'required|in:pendiente,aceptada,finalizada,cancelada',
         ]);
 
-        
+
         $fecha_reserva = now();
-        
+
         if (empty($request->fecha_recogida)) {
             $fecha_recogida = now();
         } else {
             $fecha_recogida = $request->fecha_recogida; 
         }
 
-        $origen = $request->origen; 
+        $origen = $request->origen;
         $ciudad_origen = $this->extractCity($origen);  // Extraer solo la ciudad del origen
         dd($ciudad_origen);
         // Buscar un taxista que esté en la misma ciudad
@@ -58,9 +59,9 @@ class ReservarController extends Controller
             return back()->with('error', 'No hay taxistas disponibles en la ciudad de origen.');
         }
 
-        
+
         // Obtener el taxista que mas tiempo lleve sin recibir una reserva
-        
+
         $reserva = Reserva::create([
             'cliente_id'     => $user->id,
             'taxista_id'     => $taxista->id, 
@@ -75,7 +76,7 @@ class ReservarController extends Controller
             'estado'         => $request->estado,
             'minusvalido'    => $request->minusvalido,
         ]);
-        
+
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente');
     }
 private function extractCity($address)

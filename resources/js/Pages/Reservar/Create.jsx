@@ -141,6 +141,7 @@ const Create = () => {
     const lon = parseFloat(place.lon);
     const coords = [lat, lon];
     setMarker(coords);
+    
     setSearch(place.display_name);
     setResults([]);
     setShowSuggestions(false);
