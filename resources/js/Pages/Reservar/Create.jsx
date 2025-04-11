@@ -30,6 +30,9 @@ const Create = () => {
   const [duracion, setDuracion] = useState(null);
   const tarifa_km = 1.26; // €/km
   const tarifa_min = 0.2; // €/min
+  const [latOrigen, setLatOrigen] = useState(null);
+  const [lonOrigen, setLonOrigen] = useState(null);
+
 
   // Usar useForm de Inertia.js
   const { data, setData, post, processing } = useForm({
@@ -50,6 +53,8 @@ const Create = () => {
     // Crear un objeto FormData y agregar los datos del formulario
     const formData = new FormData();
     formData.append('origen', search1);
+    formData.append('lat_origen', latOrigen);  // Latitud de origen
+    formData.append('lon_origen', lonOrigen);  // Longitud de origen
     formData.append('destino', search2);
     formData.append('distancia', distancia);
     formData.append('duracion', duracion);
@@ -136,7 +141,7 @@ const Create = () => {
     }
   }, [marker1, marker2]);
 
-  const handleSelect = (place, setMarker, setSearch, setResults, setShowSuggestions) => {
+  const handleSelect = (place, setMarker, setSearch, setResults, setShowSuggestions, isOrigen) => {
     const lat = parseFloat(place.lat);
     const lon = parseFloat(place.lon);
     const coords = [lat, lon];
@@ -146,12 +151,17 @@ const Create = () => {
     setResults([]);
     setShowSuggestions(false);
     setCenter(coords);
+
+    if (isOrigen) {
+      setLatOrigen(lat);
+      setLonOrigen(lon);
+    }
   };
 
   const RutaOverlay = () => {
     if (!mapInstance || routeCoords.length === 0) return null;
 
-    const points = routeCoords
+    const points = routeCoords  
       .map(([lat, lng]) => {
         const pixel = mapInstance.latLngToPixel({ lat, lng });
         return pixel ? `${pixel.x},${pixel.y}` : null;
@@ -215,7 +225,7 @@ const Create = () => {
                       <li
                         key={index}
                         onClick={() =>
-                          handleSelect(place, setMarker1, setSearch1, setResults1, setShowSuggestions1)
+                          handleSelect(place, setMarker1, setSearch1, setResults1, setShowSuggestions1, true)
                         }
                         className="p-2 hover:bg-gray-100 cursor-pointer"
                       >
@@ -245,7 +255,7 @@ const Create = () => {
                       <li
                         key={index}
                         onClick={() =>
-                          handleSelect(place, setMarker2, setSearch2, setResults2, setShowSuggestions2)
+                          handleSelect(place, setMarker2, setSearch2, setResults2, setShowSuggestions2, false)
                         }
                         className="p-2 hover:bg-gray-100 cursor-pointer"
                       >

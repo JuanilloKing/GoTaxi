@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Reserva;
 use App\Models\Taxista;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 
 class ReservarController extends Controller
 {
     public function store(Request $request)
     {
-        dd($request->all());
          $user = User::findOrFail(Auth::user()->id);
 
          $request->merge([
@@ -39,7 +39,22 @@ class ReservarController extends Controller
             //'estado'           => 'required|in:pendiente,aceptada,finalizada,cancelada',
         ]);
 
+        $latOrigen = $request->lat_origen;
+        $lonOrigen = $request->lon_origen;
 
+        $client = new Client();
+        $geoapifyApiKey = '3b3471c7f4ec44afa8588b257cc362d8';
+
+        $url = "https://api.geoapify.com/v1/geocode/reverse?lat=$latOrigen&lon=$lonOrigen&apiKey=$geoapifyApiKey";
+
+        $response = $client->get($url);
+        $data = json_decode($response->getBody()->getContents(), true);
+    
+        $city = $data['features'][0]['properties']['city'] ?? 'Desconocido';
+
+        // Guardar la ciudad obtenida (similar a la Opción 1)
+        return response()->json(['city' => $city]);
+        
         $fecha_reserva = now();
 
         if (empty($request->fecha_recogida)) {
@@ -48,9 +63,6 @@ class ReservarController extends Controller
             $fecha_recogida = $request->fecha_recogida; 
         }
 
-        $origen = $request->origen;
-        $ciudad_origen = $this->extractCity($origen);  // Extraer solo la ciudad del origen
-        dd($ciudad_origen);
         // Buscar un taxista que esté en la misma ciudad
         $taxista = Taxista::where('ciudad', 'LIKE', '%' . $ciudad_origen . '%')->first();
     
@@ -78,14 +90,5 @@ class ReservarController extends Controller
         ]);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente');
-    }
-private function extractCity($address)
-{
-    $address_parts = explode(',', $address);
-    $city = trim($address_parts[count($address_parts) - 3]); 
-    
-    $city = preg_replace('/(Comunidad de|Andalucía|España|Comunidad Valenciana|Islas Canarias)/i', '', $city);
-    
-    return ucfirst(strtolower($city)); 
     }
 }
