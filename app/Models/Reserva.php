@@ -25,5 +25,11 @@ class Reserva extends Model
         'estado',
         'minusvalido',
     ];
+
+    public function estado_reservas()
+    {
+    return $this->belongsTo(EstadoReserva::class);
+    }
+
     
 }

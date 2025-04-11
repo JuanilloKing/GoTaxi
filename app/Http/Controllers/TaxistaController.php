@@ -71,7 +71,7 @@ class TaxistaController extends Controller
                 $Taxista = new Taxista();
                 $Taxista->ciudad = $validated['ciudad'];
                 $Taxista->vehiculo_id = $vehiculo->id;
-                $Taxista->estado_id = 2; 
+                $Taxista->estado_taxistas_id = 1; 
                 $Taxista->save();
                 $user->tipable()->associate($Taxista);  // Asociar el usuario con el Taxista o taxista
             $user->save();  // Guardar la relación

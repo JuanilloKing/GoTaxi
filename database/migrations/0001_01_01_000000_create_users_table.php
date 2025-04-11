@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('dni')->unique();
             $table->string('telefono')->unique();
             $table->string('password');
+            $table->boolean('is_admin')->default(false);
             $table->morphs('tipable'); // tipo de usuario [Cliente o taxista]
             $table->timestamps();
         });

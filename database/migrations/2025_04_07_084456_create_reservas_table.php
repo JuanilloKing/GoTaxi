@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('fecha_reserva');
             $table->timestamp('fecha_recogida');            //es la misma que fecha reserva si se pide para recoger en el momento
             $table->timestamp('fecha_entrega')->nullable();
-            $table->foreignId('estado_id')->constrained();
+            $table->foreignId('estado_reservas_id')->constrained('estado_reservas');
             $table->string('origen');
             $table->string('destino');
             $table->string('num_pasajeros');

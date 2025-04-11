@@ -22,7 +22,6 @@ class ReservarController extends Controller
             'minusvalido' => filter_var($request->input('minusvalido'), FILTER_VALIDATE_BOOLEAN), // Convertir a booleano
             'pasajeros' => (int) $request->input('pasajeros'),    // Convertir a número
         ]);
-        
         $request->validate([
             //'fecha_reserva'    => 'required|date',
             //'fecha_recogida'   => 'required|date|after_or_equal:fecha_reserva',
@@ -38,56 +37,60 @@ class ReservarController extends Controller
             //'precio'           => 'required|numeric|min:0',
             //'estado'           => 'required|in:pendiente,aceptada,finalizada,cancelada',
         ]);
-
+        
         $latOrigen = $request->lat_origen;
         $lonOrigen = $request->lon_origen;
-
+        
         $client = new Client();
         $geoapifyApiKey = '3b3471c7f4ec44afa8588b257cc362d8';
-
+        
         $url = "https://api.geoapify.com/v1/geocode/reverse?lat=$latOrigen&lon=$lonOrigen&apiKey=$geoapifyApiKey";
-
+        
         $response = $client->get($url);
         $data = json_decode($response->getBody()->getContents(), true);
-    
-        $city = $data['features'][0]['properties']['city'] ?? 'Desconocido';
-
-        // Guardar la ciudad obtenida (similar a la Opción 1)
-        return response()->json(['city' => $city]);
         
+        $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
         $fecha_reserva = now();
-
+        
         if (empty($request->fecha_recogida)) {
             $fecha_recogida = now();
         } else {
             $fecha_recogida = $request->fecha_recogida; 
         }
+        
+        $taxista = Taxista::where('ciudad', $ciudadOrigen)
+            ->where('estado_taxistas_id', 1)
+            ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
+            ->first();
 
-        // Buscar un taxista que esté en la misma ciudad
-        $taxista = Taxista::where('ciudad', 'LIKE', '%' . $ciudad_origen . '%')->first();
-    
-        // Verificar si se encuentra un taxista en la ciudad del origen
-        if (!$taxista) {
-            return back()->with('error', 'No hay taxistas disponibles en la ciudad de origen.');
+
+        if ($taxista == null) {
+            return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
         }
-
-
-        // Obtener el taxista que mas tiempo lleve sin recibir una reserva
-
+        
         $reserva = Reserva::create([
-            'cliente_id'     => $user->id,
-            'taxista_id'     => $taxista->id, 
-            'fecha_reserva'  => $fecha_reserva,
-            'fecha_recogida' => $fecha_recogida,
-            'fecha_entrega'  => $request->fecha_entrega,
-            'origen'         => $request->origen,
-            'destino'        => $request->destino,
-            'num_pasajeros'  => $request->num_pasajeros,
-            'distancia'      => $request->distancia,
-            'precio'         => $request->precio,
-            'estado'         => $request->estado,
-            'minusvalido'    => $request->minusvalido,
+            'cliente_id'     => $user->id,  //lo pilla
+            'taxista_id'     => $taxista->id,   //lo pilla
+            'fecha_reserva'  => $fecha_reserva, //lo pilla
+            'fecha_recogida' => $fecha_recogida, //lo pilla (reservar ahora, programar fecha aun no disponible)
+            //  'fecha_entrega'  => $request->fecha_entrega,     hay que calcular cuando termine
+            'estado_reservas' => 1, //pendiente
+            'origen'         => $request->origen,       //lo pilla
+            'destino'        => $request->destino,      //lo pilla
+            'num_pasajeros'  => $request->num_pasajeros,    //lo pilla
+            'anotaciones'    => $request->anotaciones,  //lo pilla
+            'distancia'      => $request->distancia,        //lo pilla
+            'precio'         => $request->precio,           //lo pilla
+            'minusvalido'    => $request->minusvalido,      //lo pilla
         ]);
+        dd($reserva);
+
+        $taxista->ultimo_viaje = now();     //cuando termine
+
+        $taxista->save();
+
+        $reserva->save();
+        
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente');
     }
