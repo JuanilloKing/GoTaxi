@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('num_pasajeros');
             $table->string('anotaciones')->nullable();
             $table->string('distancia');
-            $table->string('precio');
+            $table->string('precio');   
             $table->boolean('minusvalido');
             $table->timestamps();
         });

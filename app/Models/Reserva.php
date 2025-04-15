@@ -22,7 +22,7 @@ class Reserva extends Model
         'distancia',
         'anotaciones',
         'precio',
-        'estado',
+        'estado_reservas_id',
         'minusvalido',
     ];
 

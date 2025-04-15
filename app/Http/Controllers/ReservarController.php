@@ -7,6 +7,7 @@ use App\Models\Reserva;
 use App\Models\Taxista;
 use App\Models\User;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ReservarController extends Controller
@@ -14,11 +15,10 @@ class ReservarController extends Controller
     public function store(Request $request)
     {
          $user = User::findOrFail(Auth::user()->id);
-
          $request->merge([
-            'distancia' => (float) $request->input('distancia'),  // Convertir a número
-            'duracion' => (int) $request->input('duracion'),      // Convertir a entero
-            'precio' => (float) $request->input('precio'),        // Convertir a número
+             'distancia' => (float) $request->input('distancia'),  // Convertir a número
+             'duracion' => (int) $request->input('duracion'),      // Convertir a entero
+             'precio' => (float) $request->input('precio'),        // Convertir a número
             'minusvalido' => filter_var($request->input('minusvalido'), FILTER_VALIDATE_BOOLEAN), // Convertir a booleano
             'pasajeros' => (int) $request->input('pasajeros'),    // Convertir a número
         ]);
@@ -37,7 +37,6 @@ class ReservarController extends Controller
             //'precio'           => 'required|numeric|min:0',
             //'estado'           => 'required|in:pendiente,aceptada,finalizada,cancelada',
         ]);
-        
         $latOrigen = $request->lat_origen;
         $lonOrigen = $request->lon_origen;
         
@@ -59,39 +58,47 @@ class ReservarController extends Controller
         }
         
         $taxista = Taxista::where('ciudad', $ciudadOrigen)
-            ->where('estado_taxistas_id', 1)
-            ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
-            ->first();
-
-
+        ->where('estado_taxistas_id', 1)
+        ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
+        ->first();
+        
+        if ($taxista->num_plazas < $request->pasajeros) {
+            return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
+            
+        }
+        
         if ($taxista == null) {
             return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
         }
-        
+
+        $pendiente = 1;
+        DB::beginTransaction();
+
         $reserva = Reserva::create([
             'cliente_id'     => $user->id,  //lo pilla
             'taxista_id'     => $taxista->id,   //lo pilla
-            'fecha_reserva'  => $fecha_reserva, //lo pilla
-            'fecha_recogida' => $fecha_recogida, //lo pilla (reservar ahora, programar fecha aun no disponible)
+            'fecha_reserva'  => date('d/m/Y H:i:s', strtotime($fecha_recogida)), //lo pilla
+            'fecha_recogida' => date('d/m/Y H:i:s', strtotime($fecha_reserva)), //lo pilla (reservar ahora, programar fecha aun no disponible)
             //  'fecha_entrega'  => $request->fecha_entrega,     hay que calcular cuando termine
-            'estado_reservas' => 1, //pendiente
             'origen'         => $request->origen,       //lo pilla
             'destino'        => $request->destino,      //lo pilla
-            'num_pasajeros'  => $request->num_pasajeros,    //lo pilla
+            'estado_reservas_id' => $pendiente, //pendiente
+            'num_pasajeros'  => $request->pasajeros,    //lo pilla
             'anotaciones'    => $request->anotaciones,  //lo pilla
             'distancia'      => $request->distancia,        //lo pilla
             'precio'         => $request->precio,           //lo pilla
             'minusvalido'    => $request->minusvalido,      //lo pilla
         ]);
-        dd($reserva);
 
+        $reserva->save();
+        $taxista->estado_taxistas_id = 3; //cambiar a ocupado
         $taxista->ultimo_viaje = now();     //cuando termine
 
         $taxista->save();
+        DB::commit();
 
-        $reserva->save();
         
 
-        return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente');
+        return redirect()->to('/')->with('success', 'Reserva creada correctamente');
     }
 }
