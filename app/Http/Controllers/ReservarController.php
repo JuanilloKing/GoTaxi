@@ -62,14 +62,15 @@ class ReservarController extends Controller
         ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
         ->first();
         
-        if ($taxista->num_plazas < $request->pasajeros) {
+        if ($taxista == null) {
+            return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
+        }
+        
+        if ($taxista->vehiculo_id->capacidad < $request->pasajeros) {
             return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
             
         }
         
-        if ($taxista == null) {
-            return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
-        }
 
         $pendiente = 1;
         DB::beginTransaction();

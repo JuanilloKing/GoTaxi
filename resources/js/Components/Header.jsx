@@ -12,6 +12,8 @@ export default function Header() {
   const isLoggedIn = !!user; // ✅ esto sustituye la prop
 
   const isTaxista = user?.tipable_type === 'App\\Models\\Taxista';
+  const taxistaId = isTaxista ? user.tipable_id : null;
+
   const avatarUrl = user?.avatar_url || '/default-avatar.png';
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -25,9 +27,15 @@ export default function Header() {
       </h1>
 
       <nav className="flex space-x-4">
-        <NavLink href={isLoggedIn ? '/reservar' : '/register'}>
-          Reservar taxi
-        </NavLink>
+      <NavLink href={
+        isLoggedIn 
+          ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
+          : '/register'}>
+        {isLoggedIn
+          ? (isTaxista ? 'Ver servicios' : 'Reservar taxi') 
+          : 'Reservar taxi'}
+      </NavLink>
+
         {!isLoggedIn && (
           <NavLink href="/login">Iniciar sesión</NavLink>
         )}

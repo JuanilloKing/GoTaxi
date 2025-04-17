@@ -95,7 +95,9 @@ class TaxistaController extends Controller
      */
     public function show(Taxista $taxista)
     {
-        //
+        return Inertia::render('Taxista/Show', [
+            'taxista' => $taxista
+        ]);
     }
 
     /**

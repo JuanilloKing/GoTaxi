@@ -32,6 +32,7 @@ Route::middleware('auth')->get('/reservar', function () {
 
 Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('registrar-taxista.create');
 Route::post('/registrar-taxista', [TaxistaController::class, 'store'])->name('registrar-taxista.store');
+Route::get('/taxistas/{taxista}', [TaxistaController::class, 'show'])->name('taxistas.show');
 
 Route::post('/reservar', [ReservarController::class, 'store'])->middleware('auth')->name('reservar.store');
 
