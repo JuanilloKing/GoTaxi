@@ -66,7 +66,7 @@ class ReservarController extends Controller
             return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
         }
         
-        if ($taxista->vehiculo_id->capacidad < $request->pasajeros) {
+        if ($taxista->vehiculo->capacidad < $request->pasajeros) {
             return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
             
         }
@@ -102,4 +102,16 @@ class ReservarController extends Controller
 
         return redirect()->to('/')->with('success', 'Reserva creada correctamente');
     }
+
+    public function finalizar(Reserva $reserva)
+{
+    $reserva->update(['fecha_entrega' => now()]);
+    $taxista = $reserva->taxista();
+    $reserva->update(['estado_reservas_id' => 5]);
+    $reserva->taxista->update(['estado_taxistas_id' => 1]);
+    $taxista->update(['ultimo_viaje' => now()]);
+    $taxista->update(['estado_taxistas_id' => 1]);
+
+    return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
+}
 }

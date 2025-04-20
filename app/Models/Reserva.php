@@ -31,5 +31,19 @@ class Reserva extends Model
     return $this->belongsTo(EstadoReserva::class);
     }
 
+    public function cliente()
+{
+    return $this->belongsTo(Cliente::class);
+}
+
+    public function taxista()
+    {
+        return $this->belongsTo(Taxista::class);
+    }
+
+    public function vehiculo()
+    {
+        return $this->hasOne(Vehiculo::class, 'id', 'vehiculo_id');
+    }
     
 }

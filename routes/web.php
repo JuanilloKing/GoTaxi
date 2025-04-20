@@ -36,6 +36,9 @@ Route::get('/taxistas/{taxista}', [TaxistaController::class, 'show'])->name('tax
 
 Route::post('/reservar', [ReservarController::class, 'store'])->middleware('auth')->name('reservar.store');
 
+Route::post('/reservas/{reserva}/finalizar', [ReservarController::class, 'finalizar'])->name('reservas.finalizar');
+
+
 
 // routes/web.php
 

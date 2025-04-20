@@ -23,6 +23,12 @@ class Taxista extends Model
     return $this->belongsTo(EstadoTaxista::class);
     }
 
+    public function reservas()
+{
+    return $this->hasMany(Reserva::class);
+}
+
+
     protected $fillable = [
         'vehiculo_id',
         'ciudad',

@@ -95,10 +95,24 @@ class TaxistaController extends Controller
      */
     public function show(Taxista $taxista)
     {
+        $reservas = $taxista->reservas()
+            ->with('cliente.user') 
+            ->get();
+    
+        $reservaActiva = $reservas->firstWhere('fecha_entrega', null);
+    
+        $reservasFinalizadas = $reservas
+            ->filter(fn($r) => $r->fecha_entrega !== null)
+            ->sortByDesc('fecha_entrega')
+            ->values(); 
+    
         return Inertia::render('Taxista/Show', [
-            'taxista' => $taxista
+            'taxista' => $taxista,
+            'reservaActiva' => $reservaActiva,
+            'reservasFinalizadas' => $reservasFinalizadas,
         ]);
     }
+    
 
     /**
      * Show the form for editing the specified resource.

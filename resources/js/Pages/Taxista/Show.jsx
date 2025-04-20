@@ -1,10 +1,19 @@
 import React from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function Show({ auth, taxista }) {
+export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas }) {
+  const user = auth.user;
+  const { post } = useForm();
+
+  const finalizarReserva = (id) => {
+    if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
+      post(route('reservas.finalizar', id));
+    }
+  };
+
   return (
-    <GuestLayout user={auth.user}>
+    <GuestLayout user={user}>
       <Head title="Servicios del taxista" />
 
       <div className="max-w-4xl mx-auto py-6 px-4">
@@ -14,37 +23,48 @@ export default function Show({ auth, taxista }) {
         <section className="mb-10">
           <h2 className="text-xl font-semibold mb-3">Servicio activo</h2>
 
-          {/* // añadir funcionalidad para obtener el servicio activo del taxista */}
-
-          <div className="bg-white p-4 rounded shadow border">
-            {/* Si no hay servicio activo, podrías mostrar un mensaje: */}
-            {/* <p className="text-gray-500">No hay ningún servicio activo actualmente.</p> */}
-
-            {/* Ejemplo de datos si hay servicio activo */}
-            <p><strong>Recoger en:</strong> {/* ubicación recogida */}</p>
-            <p><strong>Destino:</strong> {/* ubicación destino */}</p>
-            <p><strong>Cliente:</strong> {/* nombre del cliente */}</p>
-            <p><strong>Teléfono:</strong> {/* teléfono del cliente */}</p>
-          </div>
+          {reservaActiva ? (
+            <div className="bg-green-50 p-4 rounded shadow border border-green-300">
+              <p><strong>Recoger en:</strong> {reservaActiva.origen}</p>
+              <p><strong>Destino:</strong> {reservaActiva.destino}</p>
+              <p><strong>Nombre cliente:</strong> {reservaActiva.cliente.user.nombre}</p>
+              <p><strong>Teléfono:</strong> {reservaActiva.cliente.user.telefono}</p>
+              <p><strong>Anotaciones:</strong>{' '}{reservaActiva.anotaciones?.trim() ? (reservaActiva.anotaciones) : (
+                                      <span className="text-gray-400 italic">No hay anotaciones</span>)}
+</p>
+              <button
+                onClick={() => finalizarReserva(reservaActiva.id)}
+                className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              >
+                Marcar como entregado
+              </button>
+            </div>
+          ) : (
+            <p className="text-gray-500">No hay ningún servicio activo actualmente.</p>
+          )}
         </section>
 
         {/* ================= Servicios Finalizados ================= */}
         <section>
           <h2 className="text-xl font-semibold mb-3">Servicios finalizados</h2>
 
-          {/* // añadir funcionalidad para saber las reservas que han finalizado */}
-
-          <div className="space-y-4">
-            {/* // iterar aquí sobre los servicios finalizados */}
-            <div className="bg-gray-50 p-4 rounded border shadow-sm">
-              <p><strong>Recogida:</strong> {/* dirección */}</p>
-              <p><strong>Destino:</strong> {/* dirección */}</p>
-              <p><strong>Cliente:</strong> {/* nombre */}</p>
-              <p><strong>Fecha:</strong> {/* fecha del viaje */}</p>
+          {reservasFinalizadas.length === 0 ? (
+            <p className="text-gray-500">Aún no hay servicios finalizados.</p>
+          ) : (
+            <div className="space-y-4">
+              {reservasFinalizadas.map((reserva) => (
+                <div
+                  key={reserva.id}
+                  className="bg-gray-50 p-4 rounded border shadow-sm hover:shadow transition"
+                >
+                  <p><strong>Recogida:</strong> {reserva.origen}</p>
+                  <p><strong>Destino:</strong> {reserva.destino}</p>
+                  <p><strong>Cliente:</strong> {reserva.cliente?.user?.nombre}</p>
+                  <p><strong>Fecha:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
+                </div>
+              ))}
             </div>
-
-            {/* más tarjetas según los viajes finalizados */}
-          </div>
+          )}
         </section>
       </div>
     </GuestLayout>
