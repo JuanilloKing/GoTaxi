@@ -61,7 +61,7 @@ export default function UpdateProfileInformation({
 
                 {/* Apellidos */}
                 <div>
-                    <InputLabel htmlFor="apellidos" value="apellidos" />
+                    <InputLabel htmlFor="apellidos" value="Apellidos" />
 
                     <TextInput
                         id="apellidos"
@@ -122,37 +122,7 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.telefono} />
                 </div>
 
-                {/* Contraseña */}
-                <div>
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        className="mt-1 block w-full"
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        autoComplete="new-password"
-                    />
-
-                    <InputError className="mt-2" message={errors.password} />
-                </div>
-
-                {/* Confirmación de la contraseña */}
-                <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        className="mt-1 block w-full"
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        autoComplete="new-password"
-                    />
-
-                    <InputError className="mt-2" message={errors.password_confirmation} />
-                </div>
+                
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>

@@ -148,7 +148,7 @@ const RegisterTaxista = () => {
                     </div>
 
                     <div className="mt-4">
-                        <InputLabel htmlFor="email" value="Email" />
+                        <InputLabel htmlFor="email" value="Email" />    
                         <TextInput
                             id="email"
                             type="email"

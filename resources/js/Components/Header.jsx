@@ -22,31 +22,32 @@ export default function Header() {
 
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
-    <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-        GoTaxi
-        <img src="/favicon.ico" alt="GoTaxi logo" width="40" height="40" />
-      </Link>
-    </h1>
+      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+          GoTaxi
+          <img src="/favicon.ico" alt="GoTaxi logo" width="40" height="40" />
+        </Link>
+      </h1>
 
       <nav className="flex space-x-4">
-      <div className="relative">
-      <NavLink
-        href={
-          isLoggedIn 
-            ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
-            : '/register'
-        }
-      >
-        {isLoggedIn
-          ? (isTaxista ? 'Ver servicios' : 'Reservar taxi') 
-          : 'Reservar taxi'}
-      </NavLink>
+        <div className="relative">
+          <NavLink
+            href={
+              isLoggedIn 
+                ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
+                : '/register'
+            }
+          >
+            {isLoggedIn
+              ? (isTaxista ? 'Ver servicios' : 'Reservar taxi') 
+              : 'Reservar taxi'}
+          </NavLink>
 
-      {isTaxista && hasReservaActiva && (
-        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
-      )}
-    </div>
+          {isTaxista && hasReservaActiva && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
+          )}
+        </div>
+
         {!isLoggedIn && (
           <NavLink href="/login">Iniciar sesión</NavLink>
         )}
@@ -76,10 +77,10 @@ export default function Header() {
                   </li>
                   <li>
                     <Link
-                      href={route('profile.edit')}
+                      href={isTaxista ? '/taxista/editar' : route('profile.edit')}
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
-                      Editar perfil
+                      {isTaxista ? 'Editar perfil' : 'Editar perfil'}
                     </Link>
                   </li>
                   <li>
