@@ -21,6 +21,7 @@ const RegisterUser = () => {
     });
 
     const [dniError, setDniError] = useState('');
+    const [tlfnoError, setTlfnoError] = useState('');
 
     const validarDNI = (dni) => {
         const dniRegex = /^(\d{8})([A-Z])$/i;
@@ -33,6 +34,11 @@ const RegisterUser = () => {
         const letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
 
         return letras[numero % 23] === letra;
+    };
+
+    const validarTlfno = (telefono) => {
+        const telefonoRegex = /^\d{9}$/;
+        return telefonoRegex.test(telefono);
     };
 
     const handleSubmit = (e) => {
@@ -110,12 +116,19 @@ const RegisterUser = () => {
                             type="tel"
                             name="telefono"
                             value={data.telefono}
-                            onChange={handleChange}
+                            onChange={(e) => setData('telefono', e.target.value)}
+                            onBlur={() => {
+                                if (!validarTlfno(data.telefono)) {
+                                    setTlfnoError('El teléfono no es válido');
+                                } else {
+                                    setTlfnoError('');
+                                }
+                            }}
                             required
-                            className="mt-1 block w-full"
+                            className={`mt-1 block w-full ${tlfnoError ? 'border-red-500' : ''}`}
                         />
-                        <InputError message={errors.telefono} className="mt-2" />
-                    </div>
+                        <InputError message={tlfnoError || errors.telefono} className="mt-2" />
+                        </div>
 
                     <div className="mt-4">
                         <InputLabel htmlFor="email" value="Email" />
