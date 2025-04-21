@@ -8,6 +8,7 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { auth } = usePage().props;
+  const hasReservaActiva = auth.hasReservaActiva;
   const user = auth.user;
   const isLoggedIn = !!user; // ✅ esto sustituye la prop
 
@@ -21,21 +22,31 @@ export default function Header() {
 
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
-      <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+    <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
         GoTaxi
         <img src="/favicon.ico" alt="GoTaxi logo" width="40" height="40" />
-      </h1>
+      </Link>
+    </h1>
 
       <nav className="flex space-x-4">
-      <NavLink href={
-        isLoggedIn 
-          ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
-          : '/register'}>
+      <div className="relative">
+      <NavLink
+        href={
+          isLoggedIn 
+            ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
+            : '/register'
+        }
+      >
         {isLoggedIn
           ? (isTaxista ? 'Ver servicios' : 'Reservar taxi') 
           : 'Reservar taxi'}
       </NavLink>
 
+      {isTaxista && hasReservaActiva && (
+        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
+      )}
+    </div>
         {!isLoggedIn && (
           <NavLink href="/login">Iniciar sesión</NavLink>
         )}
