@@ -126,7 +126,8 @@ class TaxistaController extends Controller
             return redirect()->route('home')->with('error', 'No tienes acceso a esta página.');
         }   
         // Retorna la vista de edición con los datos del taxista
-        return inertia('Taxista/Edit', ['taxista' => $taxista]);
+        return inertia('Taxista/Edit', ['taxista' => $taxista,
+                                        'vehiculo' => $taxista->vehiculo]);
         
     }
 
