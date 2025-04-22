@@ -40,21 +40,25 @@ export default function Edit({ taxista }) {
     const submit = (e) => {
         e.preventDefault();
     
-        const dniRegex = /^[0-9]{8}[A-Za-z]$/;
-        const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+        const dni = data.dni.trim();
     
-        if (!dniRegex.test(data.dni)) {
-            setDniError('El DNI debe tener 8 números seguidos de una letra. Ej: 12345678A');
-            return;
-        }
-
-        const numero = parseInt(data.dni.substring(0, 8), 10);
-        const letra = data.dni.substring(8).toUpperCase();
-        const letraCorrecta = letras[numero % 23];
+        if (dni !== '') {
+            const dniRegex = /^[0-9]{8}[A-Za-z]$/;
+            const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
     
-        if (letra !== letraCorrecta) {
-            setDniError(`La letra del DNI no es correcta.`);
-            return;
+            if (!dniRegex.test(dni)) {
+                setDniError('El DNI debe tener 8 números seguidos de una letra. Ej: 12345678A');
+                return;
+            }
+    
+            const numero = parseInt(dni.substring(0, 8), 10);
+            const letra = dni.substring(8).toUpperCase();
+            const letraCorrecta = letras[numero % 23];
+    
+            if (letra !== letraCorrecta) {
+                setDniError(`La letra del DNI no es correcta.`);
+                return;
+            }
         }
     
         setDniError('');
@@ -63,7 +67,8 @@ export default function Edit({ taxista }) {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
-    
+
+
 
     return (
         <GuestLayout>

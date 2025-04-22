@@ -65,12 +65,15 @@ class ReservarController extends Controller
         if ($taxista == null) {
             return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
         }
-        
+
+        if ($taxista->vehiculo->disponible == false) {
+            return redirect()->back()->with('error', 'El taxi no está disponible en este momento.');
+        }
+
         if ($taxista->vehiculo->capacidad < $request->pasajeros) {
             return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
             
         }
-        
 
         $pendiente = 1;
         DB::beginTransaction();
@@ -94,24 +97,30 @@ class ReservarController extends Controller
         $reserva->save();
         $taxista->estado_taxistas_id = 3; //cambiar a ocupado
         $taxista->ultimo_viaje = now();     //cuando termine
+        $taxista->vehiculo->disponible = false; //cambiar a no disponible
 
         $taxista->save();
         DB::commit();
-
-        
 
         return redirect()->to('/')->with('success', 'Reserva creada correctamente');
     }
 
     public function finalizar(Reserva $reserva)
-{
-    $reserva->update(['fecha_entrega' => now()]);
-    $taxista = $reserva->taxista();
-    $reserva->update(['estado_reservas_id' => 5]);
-    $reserva->taxista->update(['estado_taxistas_id' => 1]);
-    $taxista->update(['ultimo_viaje' => now()]);
-    $taxista->update(['estado_taxistas_id' => 1]);
+    {
+        $reserva->update(['fecha_entrega' => now()]);
+        
+        $reserva->update(['estado_reservas_id' => 5]);
+    
+        $taxista = $reserva->taxista;
 
-    return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
-}
+        $taxista->estado_taxistas_id = 1;
+        $taxista->ultimo_viaje = now();
+        $taxista->vehiculo->disponible = true;   //cambiar a no disponible
+        $taxista->vehiculo->save();
+        $taxista->save();
+        $reserva->save();
+    
+        return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
+    }
+
 }

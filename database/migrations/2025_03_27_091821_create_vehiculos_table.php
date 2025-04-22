@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
+    /** 
      * Run the migrations.
      */
     public function up(): void
@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('matricula')->unique();
             $table->string('marca');
             $table->string('modelo');
-            $table->string('estado')->default('no disponible');
+            $table->boolean('disponible')->default(true);
             $table->string('color');
             $table->boolean('minusvalido');
             $table->string('capacidad');
