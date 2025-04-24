@@ -69,7 +69,7 @@ export default function Header() {
                 <ul className="p-2">
                   <li>
                     <Link
-                      href={isTaxista ? '/taxista-viajes' : '/cliente-viajes'}
+                      href={isTaxista ? '/taxista-viajes' : '/Cliente/mis-viajes'}
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
                       {isTaxista ? 'Próximos viajes' : 'Mis viajes'}

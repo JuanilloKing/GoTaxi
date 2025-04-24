@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservarController;
 use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
+use App\Http\Controllers\ClienteController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,6 +46,10 @@ Route::put('/taxista/editar', [TaxistaController::class, 'update'])->name('taxis
 
 Route::post('/taxista/vehiculo/cambiar', [VehiculoController::class, 'cambiar'])->name('vehiculo.cambiar');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/Cliente/mis-viajes', [ClienteController::class, 'misViajes'])
+        ->name('cliente.mis-viajes');
+});
 
 // routes/web.php
 

@@ -2,64 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cliente;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use App\Models\Reserva;
 
 class ClienteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function misViajes()
     {
-       //
-    }
+        $user = Auth::user();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        if ($user->tipable_type !== 'App\\Models\\Cliente') {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Obtener reservas asociadas a este cliente
+        $reservas = Reserva::where('cliente_id', $user->tipable_id)->get();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cliente $cliente)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cliente $cliente)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Cliente $cliente)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cliente $cliente)
-    {
-        //
+        return Inertia::render('Cliente/MisViajes', [
+            'reservas' => $reservas,
+        ]);
     }
 }
