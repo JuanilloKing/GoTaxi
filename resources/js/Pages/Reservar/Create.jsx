@@ -22,14 +22,13 @@ const Create = () => {
   const { flash } = usePage().props;
   const errorMessage = flash?.error;
   const successMessage = flash?.success;
-  
 
 
   const originRef = useRef();
   const destinationRef = useRef();
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyC2cXA_P-UnM8oELlSjZt08m_rMXWYTo-c',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_APY_KEY,
     libraries: ['places'],
   });
 

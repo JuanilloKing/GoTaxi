@@ -1,9 +1,18 @@
 import Principal from '@/Layouts/Principal'
 import { Link } from '@inertiajs/react'
 import { useState } from 'react'
+import { usePage } from '@inertiajs/react';
+import FlashMessage from '@/Components/FlashMensaje';
+
 
 export default function Welcome({ auth }) {
   const isLoggedIn = !!auth.user
+  const isCliente = isLoggedIn && auth.user.tipable_type === 'App\\Models\\Cliente'
+  const isTaxista = isLoggedIn && auth.user.tipable_type === 'App\\Models\\Taxista'
+  const taxistaId = isTaxista ? auth.user.tipable_id : null;
+  const { flash } = usePage().props;
+  const errorMessage = flash?.error;
+  const successMessage = flash?.success;
   const [showMsg, setShowMsg] = useState(false)
 
   const handleClick = (e) => {
@@ -17,8 +26,10 @@ export default function Welcome({ auth }) {
   return (
     <Principal auth={auth}>
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-24">
-
-        {/* Sección dinámica según login */}
+        {/* Modal de éxito */}
+      <FlashMessage message={flash.success} type="success" />
+      <FlashMessage message={flash.error} type="error" />
+        {/* Sección para usuario no logueado */}
         {!isLoggedIn ? (
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -49,7 +60,8 @@ export default function Welcome({ auth }) {
               />
             </div>
           </div>
-        ) : (
+        ) : isCliente ? (
+          /* Sección para clientes */
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-black mb-4">Reserva tu próximo taxi</h2>
@@ -77,7 +89,36 @@ export default function Welcome({ auth }) {
               />
             </div>
           </div>
-        )}
+        ) : isTaxista ? (
+          /* Sección para taxistas */
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-black mb-4">Bienvenido, Taxista</h2>
+              <p className="text-gray-600 mb-6">Aquí podrás gestionar tus reservas,ver el historial de tus viajes realizados, y cambiar tu estado</p>
+              <div className="space-x-4">
+              <Link
+              href={`/taxistas/${taxistaId}`}
+              className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
+              >
+              Ver servicios
+              </Link>
+                <Link
+                  href="/taxista/mi-historial"
+                  className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
+                >
+                  Cambiar disponibilidad
+                </Link>
+              </div>
+            </div>
+            <div>
+              <img
+                src="/images/fondoHombre.jpg"
+                alt="Taxista"
+                className="rounded-xl shadow-xl"
+              />
+            </div>
+          </div>
+        ) : null}
 
         {/* Sección 2: visible para todos */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -94,20 +135,20 @@ export default function Welcome({ auth }) {
               Contamos con un sistema de estimación de tiempo y precio para que puedas planificar tu viaje con antelación.
             </p>
             <div className="space-x-4">
-                <>
-                  <Link
-                    href="/consultar-tarifa"
-                    className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
-                  >
-                    Consulta las tarifas
-                  </Link>
-                  <Link
-                    href="/sobre-nosotros"
-                    className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
-                  >
-                    Conoce más sobre nosotros
-                  </Link>
-                </>
+              <>
+                <Link
+                  href="/consultar-tarifa"
+                  className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
+                >
+                  Consulta las tarifas
+                </Link>
+                <Link
+                  href="/sobre-nosotros"
+                  className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
+                >
+                  Conoce más sobre nosotros
+                </Link>
+              </>
             </div>
           </div>
         </div>

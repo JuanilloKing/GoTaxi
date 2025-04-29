@@ -93,19 +93,21 @@ class TaxistaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Taxista $taxista)
+    public function show(Request $request, Taxista $taxista)
     {
-        
-        $reservas = $taxista->reservas()
-            ->with('cliente.user') 
-            ->get();
+        // Cargar solo la reserva activa (sin fecha_entrega)
+        $reservaActiva = $taxista->reservas()
+            ->with('cliente.user')
+            ->whereNull('fecha_entrega')
+            ->first();
     
-        $reservaActiva = $reservas->firstWhere('fecha_entrega', null);
-    
-        $reservasFinalizadas = $reservas
-            ->filter(fn($r) => $r->fecha_entrega !== null)
-            ->sortByDesc('fecha_entrega')
-            ->values(); 
+        // Paginación de reservas finalizadas (con fecha_entrega)
+        $reservasFinalizadas = $taxista->reservas()
+            ->with('cliente.user')
+            ->whereNotNull('fecha_entrega')
+            ->orderByDesc('fecha_entrega')
+            ->paginate(5) // 👈 Paginamos de 5 en 5
+            ->withQueryString(); // Para mantener filtros si los hubiera
     
         return Inertia::render('Taxista/Show', [
             'taxista' => $taxista,
@@ -113,6 +115,7 @@ class TaxistaController extends Controller
             'reservasFinalizadas' => $reservasFinalizadas,
         ]);
     }
+    
 
 
     /**
@@ -174,11 +177,4 @@ class TaxistaController extends Controller
         return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente.');
             }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Taxista $taxista)
-    {
-        //
-    }
 }

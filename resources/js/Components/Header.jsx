@@ -1,7 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Link } from '@inertiajs/react';
-import ResponsiveNavLink from './ResponsiveNavLink';
 import NavLink from './NavLink';
 
 export default function Header() {

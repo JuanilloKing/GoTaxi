@@ -1,6 +1,6 @@
 import React from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas }) {
   const user = auth.user;
@@ -29,9 +29,13 @@ export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas
               <p><strong>Destino:</strong> {reservaActiva.destino}</p>
               <p><strong>Nombre cliente:</strong> {reservaActiva.cliente.user.nombre}</p>
               <p><strong>Teléfono:</strong> {reservaActiva.cliente.user.telefono}</p>
-              <p><strong>Anotaciones:</strong>{' '}{reservaActiva.anotaciones?.trim() ? (reservaActiva.anotaciones) : (
-                                      <span className="text-gray-400 italic">No hay anotaciones</span>)}
-</p>
+              <p><strong>Anotaciones:</strong>{' '}
+                {reservaActiva.anotaciones?.trim() ? (
+                  reservaActiva.anotaciones
+                ) : (
+                  <span className="text-gray-400 italic">No hay anotaciones</span>
+                )}
+              </p>
               <button
                 onClick={() => finalizarReserva(reservaActiva.id)}
                 className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
@@ -48,22 +52,46 @@ export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas
         <section>
           <h2 className="text-xl font-semibold mb-3">Servicios finalizados</h2>
 
-          {reservasFinalizadas.length === 0 ? (
+          {reservasFinalizadas.data.length === 0 ? (
             <p className="text-gray-500">Aún no hay servicios finalizados.</p>
           ) : (
-            <div className="space-y-4">
-              {reservasFinalizadas.map((reserva) => (
-                <div
-                  key={reserva.id}
-                  className="bg-gray-50 p-4 rounded border shadow-sm hover:shadow transition"
-                >
-                  <p><strong>Recogida:</strong> {reserva.origen}</p>
-                  <p><strong>Destino:</strong> {reserva.destino}</p>
-                  <p><strong>Cliente:</strong> {reserva.cliente?.user?.nombre}</p>
-                  <p><strong>Fecha:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="space-y-4">
+                {reservasFinalizadas.data.map((reserva) => (
+                  <div
+                    key={reserva.id}
+                    className="bg-gray-50 p-4 rounded border shadow-sm hover:shadow transition"
+                  >
+                    <p><strong>Recogida:</strong> {reserva.origen}</p>
+                    <p><strong>Destino:</strong> {reserva.destino}</p>
+                    <p><strong>Cliente:</strong> {reserva.cliente?.user?.nombre}</p>
+                    <p><strong>Fecha:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Paginación */}
+              <div className="mt-8 flex justify-center gap-2">
+                {reservasFinalizadas.links.map((link, i) =>
+                  link.url ? (
+                    <Link
+                      key={i}
+                      href={link.url}
+                      className={`px-3 py-1 rounded ${
+                        link.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                      }`}
+                      dangerouslySetInnerHTML={{ __html: link.label }}
+                    />
+                  ) : (
+                    <span
+                      key={i}
+                      className="px-3 py-1 text-gray-400"
+                      dangerouslySetInnerHTML={{ __html: link.label }}
+                    />
+                  )
+                )}
+              </div>
+            </>
           )}
         </section>
       </div>
