@@ -95,6 +95,7 @@ class TaxistaController extends Controller
      */
     public function show(Taxista $taxista)
     {
+        
         $reservas = $taxista->reservas()
             ->with('cliente.user') 
             ->get();

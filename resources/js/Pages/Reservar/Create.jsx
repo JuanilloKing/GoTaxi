@@ -3,6 +3,9 @@ import { GoogleMap, Marker, DirectionsRenderer, Autocomplete, useJsApiLoader } f
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 import { useForm, router } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
+import FlashMessage from '@/Components/FlashMensaje';
+
 
 const centerDefault = { lat: 36.5, lng: -6.0 };
 
@@ -15,6 +18,12 @@ const Create = () => {
   const [duracion, setDuracion] = useState(null);
   const tarifa_km = 1.26;
   const tarifa_min = 0.2;
+
+  const { flash } = usePage().props;
+  const errorMessage = flash?.error;
+  const successMessage = flash?.success;
+  
+
 
   const originRef = useRef();
   const destinationRef = useRef();
@@ -74,12 +83,12 @@ const Create = () => {
     // Obtener latitud y longitud de los puntos de origen y destino
     const originLatLng = results.routes[0].legs[0].start_location;
     const destinationLatLng = results.routes[0].legs[0].end_location;
-
+    
     // Enviar las coordenadas junto con los demás datos del formulario
     setData('lat_origen', originLatLng.lat());
     setData('lon_origen', originLatLng.lng());
   };
-
+  
   const clearRoute = () => {
     setDirections(null);
     originRef.current.value = '';
@@ -87,12 +96,14 @@ const Create = () => {
     setOrigin('');
     setDestination('');
   };
-
+  
   if (!isLoaded) return <div>Loading...</div>;
-
+  
   return (
     <div>
       <Header />
+      <FlashMessage message={flash.success} type="success" />
+      <FlashMessage message={flash.error} type="error" />        
       <div style={{ display: 'flex', height: '100vh' }}>
         <div style={{ flex: 1, padding: '20px' }}>
           <h1>Elige tu destino</h1>

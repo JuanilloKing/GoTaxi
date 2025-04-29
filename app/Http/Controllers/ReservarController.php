@@ -51,19 +51,15 @@ class ReservarController extends Controller
         
         $taxista = Taxista::where('ciudad', $ciudadOrigen)
         ->where('estado_taxistas_id', 1)
+        ->whereHas('vehiculo', function ($query) use ($request) {
+            $query->where('disponible', true) // Verificar si el vehículo está disponible
+                  ->where('capacidad', '>=', $request->pasajeros); // Verificar si la capacidad del vehículo es suficiente
+        })
         ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
         ->first();
         
         if ($taxista == null) {
-            return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
-        }
-        
-        if ($taxista->vehiculo->disponible == false) {
-            return redirect()->back()->with('error', 'El taxi no está disponible en este momento.');
-        }
-        
-        if ($taxista->vehiculo->capacidad < $request->pasajeros) {
-            return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
+            return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
         }
 
         $pendiente = 1;
@@ -96,7 +92,7 @@ class ReservarController extends Controller
             dd('Error al guardar reserva:', $e->getMessage());
         }
 
-        return redirect()->to('/')->with('success', 'Reserva creada correctamente');
+        return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
     public function finalizar(Reserva $reserva)
