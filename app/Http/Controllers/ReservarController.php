@@ -62,7 +62,7 @@ class ReservarController extends Controller
             return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
         }
 
-        $pendiente = 1;
+        $confirmada = 2;
         try {
             DB::beginTransaction();
         
@@ -77,7 +77,7 @@ class ReservarController extends Controller
                 'duracion' => $request->duracion,
                 'precio' => $request->precio,
                 'anotaciones' => $request->anotaciones,
-                'estado_reservas_id' => $pendiente,
+                'estado_reservas_id' => $confirmada,
                 'fecha_estado' => $fecha_reserva,
                 'minusvalido' => $request->minusvalido,
                 'num_pasajeros' => $request->pasajeros,
@@ -98,9 +98,9 @@ class ReservarController extends Controller
     public function finalizar(Reserva $reserva)
     {
         $reserva->update(['fecha_entrega' => now()]);
-        
+
         $reserva->update(['estado_reservas_id' => 5]);
-    
+
         $taxista = $reserva->taxista;
 
         $taxista->estado_taxistas_id = 1;
@@ -109,7 +109,7 @@ class ReservarController extends Controller
         $taxista->vehiculo->save();
         $taxista->save();
         $reserva->save();
-    
+
         return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
     }
 }
