@@ -21,10 +21,11 @@ return new class extends Migration
             $table->foreignId('estado_reservas_id')->constrained('estado_reservas');
             $table->string('origen');
             $table->string('destino');
-            $table->string('num_pasajeros');
+            $table->integer('num_pasajeros');
             $table->string('anotaciones')->nullable();
-            $table->string('distancia');
-            $table->string('precio');   
+            $table->float('distancia');
+            $table->decimal('precio', 6, 2);
+            $table->integer('duracion');
             $table->boolean('minusvalido');
             $table->timestamps();
         });

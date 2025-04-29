@@ -31,17 +31,15 @@ export default function Header() {
 
       <nav className="flex space-x-4">
         <div className="relative">
-          <NavLink
-            href={
-              isLoggedIn 
-                ? (isTaxista ? route('taxistas.show', taxistaId) : '/reservar') 
-                : '/register'
-            }
-          >
-            {isLoggedIn
-              ? (isTaxista ? 'Ver servicios' : 'Reservar taxi') 
-              : 'Reservar taxi'}
-          </NavLink>
+          {isTaxista ? (
+            <NavLink href={route('taxistas.show', taxistaId)}>
+              Ver servicios
+            </NavLink>
+          ) : (
+            <NavLink href={isLoggedIn ? '/reservar' : '/register'}>
+              Reservar taxi
+            </NavLink>
+          )}
 
           {isTaxista && hasReservaActiva && (
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>

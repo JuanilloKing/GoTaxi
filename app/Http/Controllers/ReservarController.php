@@ -14,48 +14,40 @@ class ReservarController extends Controller
 {
     public function store(Request $request)
     {
-         $user = User::findOrFail(Auth::user()->id);
-         $request->merge([
-             'distancia' => (float) $request->input('distancia'),  // Convertir a número
-             'duracion' => (int) $request->input('duracion'),      // Convertir a entero
-             'precio' => (float) $request->input('precio'),        // Convertir a número
-            'minusvalido' => filter_var($request->input('minusvalido'), FILTER_VALIDATE_BOOLEAN), // Convertir a booleano
-            'pasajeros' => (int) $request->input('pasajeros'),    // Convertir a número
+        $user = User::findOrFail(Auth::user()->id);
+        $request->merge([
+            'distancia' => (float) $request->input('distancia'),
+            'duracion' => (int) $request->input('duracion'),
+            'precio' => (float) $request->input('precio'),
+            'minusvalido' => filter_var($request->input('minusvalido'), FILTER_VALIDATE_BOOLEAN),
+            'pasajeros' => (int) $request->input('pasajeros'),
         ]);
+        
         $request->validate([
-            //'fecha_reserva'    => 'required|date',
-            //'fecha_recogida'   => 'required|date|after_or_equal:fecha_reserva',
-            //'fecha_entrega'    => 'nullable|date|after_or_equal:fecha_recogida',
-            'origen'           => 'required|string|max:255',
-            'destino'          => 'required|string|max:255',
-            'distancia'        => 'required|numeric|min:0',
-            'duracion'         => 'required|numeric|min:0',
-            'precio'           => 'required|numeric|min:0',
-            'anotaciones'      => 'nullable|string|max:255',
-            'minusvalido'      => 'required|boolean',
-            'pasajeros'    => 'required|integer|min:1|max:8',
-            //'precio'           => 'required|numeric|min:0',
-            //'estado'           => 'required|in:pendiente,aceptada,finalizada,cancelada',
+            'origen' => 'required|string|max:255',
+            'destino' => 'required|string|max:255',
+            'distancia' => 'required|numeric|min:0',
+            'duracion' => 'required|numeric|min:0',
+            'precio' => 'required|numeric|min:0',
+            'anotaciones' => 'nullable|string|max:255',
+            'minusvalido' => 'required|boolean',
+            'pasajeros' => 'required|integer|min:1|max:8',
         ]);
+        
+        // Obtener las coordenadas de origen y destino
         $latOrigen = $request->lat_origen;
         $lonOrigen = $request->lon_origen;
         
+        // Lógica de geolocalización para el origen
         $client = new Client();
         $geoapifyApiKey = '3b3471c7f4ec44afa8588b257cc362d8';
-        
         $url = "https://api.geoapify.com/v1/geocode/reverse?lat=$latOrigen&lon=$lonOrigen&apiKey=$geoapifyApiKey";
-        
         $response = $client->get($url);
         $data = json_decode($response->getBody()->getContents(), true);
-        
         $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
-        $fecha_reserva = now();
         
-        if (empty($request->fecha_recogida)) {
-            $fecha_recogida = now();
-        } else {
-            $fecha_recogida = $request->fecha_recogida; 
-        }
+        $fecha_reserva = now();
+        $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
         
         $taxista = Taxista::where('ciudad', $ciudadOrigen)
         ->where('estado_taxistas_id', 1)
@@ -65,42 +57,44 @@ class ReservarController extends Controller
         if ($taxista == null) {
             return redirect()->back()->with('error', 'No hay taxista disponibles en la ciudad de origen.');
         }
-
+        
         if ($taxista->vehiculo->disponible == false) {
             return redirect()->back()->with('error', 'El taxi no está disponible en este momento.');
         }
-
+        
         if ($taxista->vehiculo->capacidad < $request->pasajeros) {
             return redirect()->back()->with('error', 'El número de pasajeros excede la capacidad del vehículo.');
-            
         }
 
         $pendiente = 1;
-        DB::beginTransaction();
-
-        $reserva = Reserva::create([
-            'cliente_id'     => $user->id,  //lo pilla
-            'taxista_id'     => $taxista->id,   //lo pilla
-            'fecha_reserva'  => date('d/m/Y H:i:s', strtotime($fecha_recogida)), //lo pilla
-            'fecha_recogida' => date('d/m/Y H:i:s', strtotime($fecha_reserva)), //lo pilla (reservar ahora, programar fecha aun no disponible)
-            //  'fecha_entrega'  => $request->fecha_entrega,     hay que calcular cuando termine
-            'origen'         => $request->origen,       //lo pilla
-            'destino'        => $request->destino,      //lo pilla
-            'estado_reservas_id' => $pendiente, //pendiente
-            'num_pasajeros'  => $request->pasajeros,    //lo pilla
-            'anotaciones'    => $request->anotaciones,  //lo pilla
-            'distancia'      => $request->distancia,        //lo pilla
-            'precio'         => $request->precio,           //lo pilla
-            'minusvalido'    => $request->minusvalido,      //lo pilla
-        ]);
-
-        $reserva->save();
-        $taxista->estado_taxistas_id = 3; //cambiar a ocupado
-        $taxista->ultimo_viaje = now();     //cuando termine
-        $taxista->vehiculo->disponible = false; //cambiar a no disponible
-
-        $taxista->save();
-        DB::commit();
+        try {
+            DB::beginTransaction();
+        
+            $reserva = Reserva::create([
+                'cliente_id' => $user->id,
+                'taxista_id' => $taxista->id,
+                'fecha_reserva' => date('Y-m-d H:i:s', strtotime($fecha_recogida)),
+                'fecha_recogida' => $fecha_recogida,
+                'origen' => $request->origen,
+                'destino' => $request->destino,
+                'distancia' => $request->distancia,
+                'duracion' => $request->duracion,
+                'precio' => $request->precio,
+                'anotaciones' => $request->anotaciones,
+                'estado_reservas_id' => $pendiente,
+                'fecha_estado' => $fecha_reserva,
+                'minusvalido' => $request->minusvalido,
+                'num_pasajeros' => $request->pasajeros,
+            ]);
+            DB::commit();
+            $taxista->estado_taxistas_id = 2;
+            $taxista->vehiculo->disponible = false;
+            $taxista->vehiculo->save();
+            $taxista->save();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd('Error al guardar reserva:', $e->getMessage());
+        }
 
         return redirect()->to('/')->with('success', 'Reserva creada correctamente');
     }
@@ -115,12 +109,11 @@ class ReservarController extends Controller
 
         $taxista->estado_taxistas_id = 1;
         $taxista->ultimo_viaje = now();
-        $taxista->vehiculo->disponible = true;   //cambiar a no disponible
+        $taxista->vehiculo->disponible = true;
         $taxista->vehiculo->save();
         $taxista->save();
         $reserva->save();
     
         return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
     }
-
 }

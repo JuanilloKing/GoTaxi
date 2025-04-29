@@ -23,6 +23,7 @@
         "vite": "^6.0.11"
     },
     "dependencies": {
+        "@react-google-maps/api": "^2.20.6",
         "leaflet": "^1.9.4",
         "leaflet-routing-machine": "^3.2.12",
         "pigeon-maps": "^0.22.1"

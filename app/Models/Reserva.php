@@ -16,6 +16,7 @@ class Reserva extends Model
         'fecha_reserva',
         'fecha_recogida',
         'fecha_entrega',
+        'duracion',
         'origen',
         'destino',
         'num_pasajeros',
