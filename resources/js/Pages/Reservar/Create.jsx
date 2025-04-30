@@ -23,7 +23,6 @@ const Create = () => {
   const errorMessage = flash?.error;
   const successMessage = flash?.success;
 
-
   const originRef = useRef();
   const destinationRef = useRef();
 
