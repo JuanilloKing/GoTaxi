@@ -41,9 +41,15 @@ Route::post('/reservar', [ReservarController::class, 'store'])->middleware('auth
 
 Route::post('/reservas/{reserva}/finalizar', [ReservarController::class, 'finalizar'])->name('reservas.finalizar');
 
+Route::post('/reservas/{reserva}/cancelar', [ReservarController::class, 'cancelar'])->name('reservas.cancelar');
+
 Route::get('/taxista/editar', [TaxistaController::class, 'edit'])->name('taxista.edit');
 
 Route::put('/taxista/editar', [TaxistaController::class, 'update'])->name('taxista.update')->middleware('auth');
+
+Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado'])
+    ->middleware(['auth', 'verified'])
+    ->name('taxista.cambiar-estado');
 
 Route::post('/taxista/vehiculo/cambiar', [VehiculoController::class, 'cambiar'])->name('vehiculo.cambiar');
 

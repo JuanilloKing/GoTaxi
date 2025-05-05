@@ -1,10 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { GoogleMap, Marker, DirectionsRenderer, Autocomplete, useJsApiLoader } from '@react-google-maps/api';
-import Header from '@/Components/Header';
-import Footer from '@/Components/Footer';
+import Principal from '@/Layouts/Principal'
 import { useForm, router } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import FlashMessage from '@/Components/FlashMensaje';
 
 
 const centerDefault = { lat: 36.5, lng: -6.0 };
@@ -19,9 +17,8 @@ const Create = () => {
   const tarifa_km = 1.26;
   const tarifa_min = 0.2;
 
-  const { flash } = usePage().props;
+  const { auth, flash } = usePage().props;
   const errorMessage = flash?.error;
-  const successMessage = flash?.success;
 
   const originRef = useRef();
   const destinationRef = useRef();
@@ -95,13 +92,11 @@ const Create = () => {
     setDestination('');
   };
   
-  if (!isLoaded) return <div>Loading...</div>;
-  
+  if (!isLoaded) return <div>Cargando...</div>;
+
   return (
     <div>
-      <Header />
-      <FlashMessage message={flash.success} type="success" />
-      <FlashMessage message={flash.error} type="error" />        
+      <Principal auth={auth} flash={flash}>
       <div style={{ display: 'flex', height: '100vh' }}>
         <div style={{ flex: 1, padding: '20px' }}>
           <h1>Elige tu destino</h1>
@@ -214,7 +209,7 @@ const Create = () => {
           </form>
         </div>
       </div>
-      <Footer />
+      </Principal>
     </div>
   );
 };

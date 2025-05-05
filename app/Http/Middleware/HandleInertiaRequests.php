@@ -33,23 +33,34 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => fn () => $request->user(),
+
                 'hasReservaActiva' => function () use ($request) {
                     $user = $request->user();
-    
+
                     if (!$user || $user->tipable_type !== 'App\\Models\\Taxista') {
                         return false;
                     }
-    
+
                     return Reserva::where('taxista_id', $user->tipable_id)
                         ->whereNull('fecha_entrega')
                         ->exists();
                 },
+
+                'estado_id' => function () use ($request) {
+                    $user = $request->user();
+
+                    if (!$user || $user->tipable_type !== 'App\\Models\\Taxista') {
+                        return null;
+                    }
+
+                    return $user->tipable->estado_taxistas_id;
+                },
             ],
+
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
         ]);
     }
-    
 }

@@ -1,23 +1,23 @@
 import { Link, router } from '@inertiajs/react';
-import Footer from '@/Components/Footer';
-import Header from '@/Components/Header';
+import { usePage } from '@inertiajs/react';
+import Principal from '@/Layouts/Principal'
+
 
 export default function MisViajes({ auth, reservas }) {
   const reservaActiva = reservas.data.find(r => r.estado_reservas_id === 2);
   const reservasAnteriores = reservas.data.filter(r => r.estado !== 'activa');
-
-  const finalizarReserva = (id) => {
+  const { flash } = usePage().props;
+  const cancelarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
-      router.post(route('reservas.finalizar', id));
+      router.post(route('reservas.cancelar', id));
     }
   };
 
   return (
+      <Principal auth={auth} flash={flash}>
     <div>
-      <Header />
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-12">
         <h1 className="text-4xl font-bold text-center mb-8">Mis Viajes</h1>
-
         {/* Reserva activa */}
         {reservaActiva ? (
           <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
@@ -33,7 +33,7 @@ export default function MisViajes({ auth, reservas }) {
             </div>
             <button
               className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-              onClick={() => finalizarReserva(reservaActiva.id)}
+              onClick={() => cancelarReserva(reservaActiva.id)}
             >
               Cancelar Reserva
             </button>
@@ -53,10 +53,12 @@ export default function MisViajes({ auth, reservas }) {
                 {reservasAnteriores.map((reserva, i) => (
                   <li key={i} className="p-6 bg-white rounded-xl shadow border border-gray-100">
                     <div className="grid md:grid-cols-2 gap-4">
-                      <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString('es-ES')}</p>
-                      <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString('es-ES')}</p>
                       <p><strong>Origen:</strong> {reserva.origen}</p>
                       <p><strong>Destino:</strong> {reserva.destino}</p>
+                      <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString('es-ES')}</p>
+                      {reserva.estado_reservas.estado == "finalizada" && (
+                      <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString('es-ES')}</p>
+                      )}
                       <p><strong>Pasajeros:</strong> {reserva.num_pasajeros}</p>
                       <p><strong>Estado:</strong> <span className="capitalize">{reserva.estado_reservas.estado}</span></p>
                     </div>
@@ -89,7 +91,7 @@ export default function MisViajes({ auth, reservas }) {
           )}
         </div>
       </div>
-      <Footer />
     </div>
+    </Principal>
   );
 }

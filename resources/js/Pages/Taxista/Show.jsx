@@ -1,10 +1,13 @@
 import React from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 
-export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas }) {
-  const user = auth.user;
+import Principal
+ from '@/Layouts/Principal';
+export default function Show({reservaActiva, reservasFinalizadas }) {
   const { post } = useForm();
+  const { auth, flash } = usePage().props;
 
   const finalizarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
@@ -13,7 +16,7 @@ export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas
   };
 
   return (
-    <GuestLayout user={user}>
+    <Principal auth={auth} flash={flash}>
       <Head title="Servicios del taxista" />
 
       <div className="max-w-4xl mx-auto py-6 px-4">
@@ -95,6 +98,6 @@ export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas
           )}
         </section>
       </div>
-    </GuestLayout>
+    </Principal>
   );
 }

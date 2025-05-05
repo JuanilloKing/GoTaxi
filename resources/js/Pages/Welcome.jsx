@@ -32,8 +32,6 @@ export default function Welcome({ auth }) {
   const isTaxista = isLoggedIn && auth.user.tipable_type === 'App\\Models\\Taxista'
   const taxistaId = isTaxista ? auth.user.tipable_id : null;
   const { flash } = usePage().props;
-  const errorMessage = flash?.error;
-  const successMessage = flash?.success;
   const [showMsg, setShowMsg] = useState(false)
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
@@ -47,11 +45,8 @@ export default function Welcome({ auth }) {
   }
 
   return (
-    <Principal auth={auth}>
+    <Principal auth={auth} flash={flash}>
       <div className="max-w-7xl mx-auto px-4 py-16 space-y-24 text-lg">
-        {/* Modal de éxito */}
-      <FlashMessage message={flash.success} type="success" />
-      <FlashMessage message={flash.error} type="error" />
         {/* Sección para usuario no logueado */}
         {!isLoggedIn ? (
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -71,7 +66,7 @@ export default function Welcome({ auth }) {
                   href="/register"
                   className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
                 >
-                  ¿No tienes cuenta de GoTaxi? Regístrate
+                  ¿No tienes cuenta? Regístrate
                 </Link>
               </div>
             </div>

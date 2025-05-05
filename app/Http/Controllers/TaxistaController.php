@@ -38,10 +38,10 @@ class TaxistaController extends Controller
                 'apellidos' => 'required|string|max:255',
                 'dni' => ['sometimes', 'string', 'unique:users,dni', 'regex:/^\d{8}[A-Z]$/'],
                 'telefono' => 'required|string|unique:users,telefono',
-                'email' => 'required|email|unique:users,email', 
+                'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8|confirmed',
-                'password_confirmation' => 'required|string|min:8|same:password', 
-                'ciudad' => 'required|string|max:255',
+                'password_confirmation' => 'required|string|min:8|same:password',
+                'ciudad' => 'required|string|max:255',                                  // tabla de ciudad, SQL ccaa-provincias-municipios
                 'licencia_taxi' => 'required|string|max:255',
                 'matricula' => 'required|string|max:255',
                 'marca' => 'required|string|max:255',
@@ -176,5 +176,30 @@ class TaxistaController extends Controller
 
         return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente.');
             }
+
+
+        public function cambiarEstado()
+        {   
+            $user = Auth::user();
+            
+            if (!$user || $user->tipable_type !== 'App\\Models\\Taxista') {
+                abort(403, 'No autorizado.');
+            }
+            $taxista = $user->tipable;
+
+            if ($taxista->estado_taxistas_id == 2) {
+                return back()->with('error', 'No puedes cambiar el estado teniendo un servicio activo.');
+            }
+            if ($taxista->estado_taxistas_id == 1) {
+                // Cambiar a ocupado
+                $taxista->estado_taxistas_id = 3;
+
+            } elseif ($taxista->estado_taxistas_id == 3) {
+                // Cambiar disponible
+                $taxista->estado_taxistas_id = 1;
+            }
+            $taxista->save();
+            return back()->with('success', 'Estado de disponibilidad actualizado correctamente.');
+        }
 
 }

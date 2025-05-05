@@ -49,18 +49,46 @@ class ReservarController extends Controller
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
         
-        $taxista = Taxista::where('ciudad', $ciudadOrigen)
-        ->where('estado_taxistas_id', 1)
-        ->whereHas('vehiculo', function ($query) use ($request) {
-            $query->where('disponible', true) // Verificar si el vehículo está disponible
-                  ->where('capacidad', '>=', $request->pasajeros); // Verificar si la capacidad del vehículo es suficiente
-        })
-        ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
-        ->first();
-        
-        if ($taxista == null) {
-            return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
+    // Buscar taxistas en la ciudad
+    $taxistasEnCiudad = Taxista::where('ciudad', $ciudadOrigen)->get();
+
+    if ($taxistasEnCiudad->isEmpty()) {
+        return redirect()->back()->with('error', 'No tenemos taxistas para esa ciudad.');
+    }
+
+    // Filtrar por estado disponible
+    $taxistasDisponibles = $taxistasEnCiudad->where('estado_taxistas_id', 1);
+
+    if ($taxistasDisponibles->isEmpty()) {
+        return redirect()->back()->with('error', 'Todos los taxistas de esta zona están ocupados, inténtelo más tarde.');
+    }
+
+    // Si el usuario requiere vehículo adaptado, filtramos solo los que lo tienen.
+    if ($request->minusvalido) {
+        $taxistasDisponibles = $taxistasDisponibles->filter(function ($taxista) {
+            return $taxista->vehiculo && $taxista->vehiculo->minusvalido === true;
+        });
+
+        if ($taxistasDisponibles->isEmpty()) {
+            return redirect()->back()->with('error', 'No hay vehículos adaptados para personas con movilidad reducida disponibles en esta zona.');
         }
+    }
+
+    // Ahora filtramos por capacidad suficiente.
+    $taxistasConVehiculoAdecuado = $taxistasDisponibles->filter(function ($taxista) use ($request) {
+        $vehiculo = $taxista->vehiculo;
+        return $vehiculo && $vehiculo->disponible && $vehiculo->capacidad >= $request->pasajeros;
+    });
+
+    if ($taxistasConVehiculoAdecuado->isEmpty()) {
+        return redirect()->back()->with('error', 'Los taxistas disponibles no tienen la capacidad indicada. Ingrese un número inferior de pasajeros o inténtelo más tarde.');
+    }
+
+    // Elegimos el que lleve mas tiempo sin hacer una reserva
+    $taxista = $taxistasConVehiculoAdecuado->sortBy(function ($t) {
+        return $t->ultimo_viaje ?? '1970-01-01 00:00:00';
+    })->first();
+
 
         $confirmada = 2;
         try {
@@ -111,5 +139,20 @@ class ReservarController extends Controller
         $reserva->save();
 
         return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
+    }
+
+    public function cancelar(Reserva $reserva)
+    {
+        $reserva->update(['estado_reservas_id' => 3]);
+
+        $taxista = $reserva->taxista;
+
+        $taxista->estado_taxistas_id = 1;
+        $taxista->vehiculo->disponible = true;
+        $taxista->vehiculo->save();
+        $taxista->save();
+        $reserva->save();
+
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
     }
 }

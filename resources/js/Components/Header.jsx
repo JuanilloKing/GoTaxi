@@ -1,23 +1,58 @@
-import { usePage } from '@inertiajs/react';
+import { usePage, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { Link } from '@inertiajs/react';
 import NavLink from './NavLink';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { auth } = usePage().props;
+  const estadoId = auth.estado_id;
   const hasReservaActiva = auth.hasReservaActiva;
   const user = auth.user;
-  const isLoggedIn = !!user; // ✅ esto sustituye la prop
+  const isLoggedIn = !!user;
 
   const isTaxista = user?.tipable_type === 'App\\Models\\Taxista';
   const taxistaId = isTaxista ? user.tipable_id : null;
-
   const avatarUrl = user?.avatar_url || '/default-avatar.png';
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const closeDropdown = () => setIsDropdownOpen(false);
+
+  const getEstadoTexto = (estadoId) => {
+    switch (estadoId) {
+      case 1:
+        return 'Disponible';
+      case 2:
+        return 'Ocupado';
+      case 3:
+        return 'No disponible';
+      default:
+        return 'Desconocido';
+    }
+  };
+
+  const getEstadoColor = (estadoId) => {
+    switch (estadoId) {
+      case 1:
+        return 'bg-green-500'; // Disponible
+      case 2:
+        return 'bg-black';     // Ocupado
+      case 3:
+        return 'bg-red-500';   // No disponible
+      default:
+        return 'bg-gray-400';  // Desconocido
+    }
+  };
+  
+
+  const cambiarEstado = () => {
+    // Solo permite cambiar entre estado 1 (disponible) y 3 (no disponible)
+    const nuevoEstado = estadoId === 1 ? 3 : 1;
+
+    router.post(route('taxista.cambiar-estado'), {
+      estado_id: nuevoEstado
+    });
+  };
 
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
@@ -46,12 +81,10 @@ export default function Header() {
         </div>
 
         {!isLoggedIn && (
-          <NavLink href="/login">Iniciar sesión</NavLink>
-        )}
-        {!isLoggedIn && (
-          <NavLink href="/registrar-taxista">
-            Taxistas
-          </NavLink>
+          <>
+            <NavLink href="/login">Iniciar sesión</NavLink>
+            <NavLink href="/registrar-taxista">Taxistas</NavLink>
+          </>
         )}
 
         {isLoggedIn && (
@@ -65,21 +98,41 @@ export default function Header() {
               <div className="absolute right-0 mt-2 bg-white border rounded shadow-lg">
                 <ul className="p-2">
                   <li>
-                    <Link
-                      href={isTaxista ? '/taxista-viajes' : '/Cliente/mis-viajes'}
-                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                    >
-                      {isTaxista ? 'Próximos viajes' : 'Mis viajes'}
-                    </Link>
+                  {isTaxista ? (
+                  <div className="block px-4 py-2 text-gray-800 flex items-center gap-2 cursor-default">
+                    <span className={`inline-block w-3 h-3 rounded-full ${getEstadoColor(estadoId)}`}></span>
+                    {getEstadoTexto(estadoId)}
+                  </div>
+                ) : (
+                  <Link
+                    href="/Cliente/mis-viajes"
+                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200 flex items-center gap-2"
+                  >
+                    Mis viajes
+                  </Link>
+                )}
                   </li>
+
+                  {isTaxista && (
+                    <li>
+                      <button
+                        onClick={cambiarEstado}
+                        className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-gray-100"
+                      >
+                        Cambiar disponibilidad
+                      </button>
+                    </li>
+                  )}
+
                   <li>
                     <Link
                       href={isTaxista ? '/taxista/editar' : route('profile.edit')}
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
-                      {isTaxista ? 'Editar perfil' : 'Editar perfil'}
+                      Editar perfil
                     </Link>
                   </li>
+
                   <li>
                     <Link
                       href="/logout"
