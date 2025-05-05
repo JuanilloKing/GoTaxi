@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GoogleMap, Marker, DirectionsRenderer, Autocomplete, useJsApiLoader } from '@react-google-maps/api';
 import Principal from '@/Layouts/Principal'
 import { useForm, router } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 
-
 const centerDefault = { lat: 36.5, lng: -6.0 };
 
 const Create = () => {
+  const [localFlash, setLocalFlash] = useState({ message: null, type: null });
   const [map, setMap] = useState(null);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
@@ -41,6 +41,16 @@ const Create = () => {
     lon_origen: 0,
   });
 
+  useEffect(() => {
+    if (localFlash.message) {
+      const timer = setTimeout(() => {
+        setLocalFlash({ message: null, type: null });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [localFlash]);
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -60,29 +70,46 @@ const Create = () => {
 
   const calculateRoute = async () => {
     if (!originRef.current.value || !destinationRef.current.value) return;
+  
     const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirections(results);
-    setOrigin(originRef.current.value);
-    setDestination(destinationRef.current.value);
-
-    const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
-    const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
-    setDistancia(km);
-    setDuracion(min);
-
-    // Obtener latitud y longitud de los puntos de origen y destino
-    const originLatLng = results.routes[0].legs[0].start_location;
-    const destinationLatLng = results.routes[0].legs[0].end_location;
     
-    // Enviar las coordenadas junto con los demás datos del formulario
-    setData('lat_origen', originLatLng.lat());
-    setData('lon_origen', originLatLng.lng());
+    directionsService.route(
+      {
+        origin: originRef.current.value,
+        destination: destinationRef.current.value,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (results, status) => {
+        if (status === 'OK') {
+          setDirections(results);
+          setOrigin(originRef.current.value);
+          setDestination(destinationRef.current.value);
+  
+          const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
+          const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
+          setDistancia(km);
+          setDuracion(min);
+  
+          const originLatLng = results.routes[0].legs[0].start_location;
+          setData('lat_origen', originLatLng.lat());
+          setData('lon_origen', originLatLng.lng());
+  
+        } else if (status === 'ZERO_RESULTS') {
+          setLocalFlash({
+            message: 'No se pudo encontrar una ruta entre el origen y el destino.',
+            type: 'error'
+          });
+          setDirections(null); // Limpiar si había uno anterior
+        } else {
+          setLocalFlash({
+            message: 'Error al calcular la ruta. Inténtalo de nuevo.',
+            type: 'error'
+          });
+        }
+      }
+    );
   };
+  
   
   const clearRoute = () => {
     setDirections(null);
@@ -97,6 +124,21 @@ const Create = () => {
   return (
     <div>
       <Principal auth={auth} flash={flash}>
+      {localFlash.message && (
+        <div
+          className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg z-50 text-white transition-all duration-300 flex items-center justify-between min-w-[250px] ${
+            localFlash.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          }`}
+        >
+          <span>{localFlash.message}</span>
+          <button
+            onClick={() => setLocalFlash({ message: null, type: null })}
+            className="ml-4 font-bold hover:text-gray-200 text-lg leading-none"
+          >
+            x
+          </button>
+        </div>
+      )}
       <div style={{ display: 'flex', height: '100vh' }}>
         <div style={{ flex: 1, padding: '20px' }}>
           <h1>Elige tu destino</h1>

@@ -9,6 +9,8 @@ use App\Models\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificarTaxistaNuevaReserva;
 
 class ReservarController extends Controller
 {
@@ -114,7 +116,11 @@ class ReservarController extends Controller
             $taxista->estado_taxistas_id = 2;
             $taxista->vehiculo->disponible = false;
             $taxista->vehiculo->save();
-            $taxista->save();
+            $taxista->save();   
+            Mail::to($taxista->email)->send(new NotificarTaxistaNuevaReserva(
+                $request->origen,
+                $request->destino
+            ));
         } catch (\Exception $e) {
             DB::rollBack();
             dd('Error al guardar reserva:', $e->getMessage());
