@@ -116,10 +116,10 @@ class ReservarController extends Controller
             $taxista->estado_taxistas_id = 2;
             $taxista->vehiculo->disponible = false;
             $taxista->vehiculo->save();
-            $taxista->save();   
-            Mail::to($taxista->email)->send(new NotificarTaxistaNuevaReserva(
+            $taxista->save();
+            Mail::to($taxista->user->email)->send(new NotificarTaxistaNuevaReserva(
                 $request->origen,
-                $request->destino
+                $request->destino   
             ));
         } catch (\Exception $e) {
             DB::rollBack();

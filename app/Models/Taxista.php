@@ -10,7 +10,7 @@ class Taxista extends Model
     /** @use HasFactory<\Database\Factories\TaxistaFactory> */
     use HasFactory;
 
-    public function users() {
+    public function user() {
         return $this->morphOne(User::class, 'tipable');
     }
 
