@@ -46,7 +46,7 @@ class ReservarController extends Controller
         $url = "https://api.geoapify.com/v1/geocode/reverse?lat=$latOrigen&lon=$lonOrigen&apiKey=$geoapifyApiKey";
         $response = $client->get($url);
         $data = json_decode($response->getBody()->getContents(), true);
-        $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
+        $ciudadOrigen = $data['features'][0]['pro   perties']['city'] ?? 'Desconocido';
         
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
@@ -119,7 +119,7 @@ class ReservarController extends Controller
             $taxista->save();
             Mail::to($taxista->user->email)->send(new NotificarTaxistaNuevaReserva(
                 $request->origen,
-                $request->destino   
+                $request->destino
             ));
         } catch (\Exception $e) {
             DB::rollBack();
