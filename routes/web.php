@@ -52,6 +52,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('cliente.mis-viajes');
 });
 
+Route::get('/sobre-nosotros', function () {
+    return Inertia::render('SobreNosotros');
+})->name('sobre-nosotros');
+
 // routes/web.php
 
 require __DIR__.'/auth.php';
