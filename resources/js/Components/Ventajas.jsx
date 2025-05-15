@@ -8,8 +8,8 @@ const features = [
   },
   {
     img: '/images/24-7.svg',
-    title: 'La mejor atención',
-    desc: 'Nuestro equipo de atención al cliente disponible siempre para ti 365/7.',
+    title: 'Atención al cliente',
+    desc: 'Nuestro equipo de atención al cliente disponible en todo momento.',
   },
   {
     img: '/images/taximetro.png',
@@ -19,27 +19,27 @@ const features = [
   {
     img: '/images/taxis.png',
     title: 'Servicio garantizado',
-    desc: 'Las principales compañías de taxi disponibles para ti.',
+    desc: 'Todas las reservas están garantizadas.',
   },
   {
-    img: '/images/rapido.png',
+    img: '/images/IconoFast.png',
     title: 'Rápido servicio',
     desc: 'Siempre valoramos tu tiempo.',
   },
   {
-    img: '/images/facil.png',
+    img: '/images/IconoFacil.png',
     title: 'Fácil de usar',
-    desc: 'Nuestra App pensada para todos.',
+    desc: 'Nuestra web pensada para usarse en ordenadores y moviles.',
   },
   {
-    img: '/images/presencia.png',
+    img: '/images/IconoCiudad.png',
     title: 'Amplia presencia',
-    desc: 'Más de 100 ciudades esperándote.',
+    desc: 'Más de 40 ciudades esperándote.',
   },
   {
-    img: '/images/seguridad-extra.png',
-    title: 'Máxima seguridad',
-    desc: 'Todas las medidas de protección e higiene.',
+    img: '/images/limpieza.png',
+    title: 'Limpieza',
+    desc: 'Nuestros vehículos son desinfectados a diario.',
   },
 ];
 

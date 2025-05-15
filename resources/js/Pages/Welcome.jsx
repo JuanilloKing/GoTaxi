@@ -60,7 +60,7 @@ export default function Welcome({ auth }) {
               <p className="text-gray-600 mb-6">
                 Consulta el historial de viajes, sugerencias personalizadas, recursos de ayuda y mucho más.
               </p>
-              <div className="space-x-4">
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                 <Link
                   href="/login"
                   className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
@@ -71,7 +71,7 @@ export default function Welcome({ auth }) {
                   href="/register"
                   className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
                 >
-                  ¿No tienes cuenta de GoTaxi? Regístrate
+                  ¿No tienes cuenta? Regístrate
                 </Link>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Welcome({ auth }) {
             <div>
               <h2 className="text-4xl font-bold text-black mb-4">Reserva tu próximo taxi</h2>
               <p className="text-gray-600 mb-6">También puedes consultar tus últimos viajes realizados, o reservados</p>
-              <div className="space-x-4">
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                 <Link
                   href="/reservar"
                   className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
@@ -118,7 +118,7 @@ export default function Welcome({ auth }) {
             <div>
               <h2 className="text-4xl font-bold text-black mb-4">Bienvenido, Taxista</h2>
               <p className="text-gray-600 mb-6">Aquí podrás gestionar tus reservas,ver el historial de tus viajes realizados, y cambiar tu estado</p>
-              <div className="space-x-4">
+              <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
               <Link
               href={`/taxistas/${taxistaId}`}
               className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
@@ -157,7 +157,7 @@ export default function Welcome({ auth }) {
             <p className="text-gray-600 mb-6">
               Contamos con un sistema de estimación de tiempo y precio para que puedas planificar tu viaje con antelación.
             </p>
-            <div className="space-x-4">
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
               <>
                 <Link
                   href="/consultar-tarifa"
