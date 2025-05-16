@@ -106,7 +106,7 @@ class TaxistaController extends Controller
             ->with('cliente.user')
             ->whereNotNull('fecha_entrega')
             ->orderByDesc('fecha_entrega')
-            ->paginate(5) // 👈 Paginamos de 5 en 5
+            ->paginate(5) // Paginamos de 5 en 5
             ->withQueryString(); // Para mantener filtros si los hubiera
     
         return Inertia::render('Taxista/Show', [
@@ -176,5 +176,30 @@ class TaxistaController extends Controller
 
         return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente.');
             }
+
+
+        public function cambiarEstado()
+        {   
+            $user = Auth::user();
+            
+            if (!$user || $user->tipable_type !== 'App\\Models\\Taxista') {
+                abort(403, 'No autorizado.');
+            }
+            $taxista = $user->tipable;
+
+            if ($taxista->estado_taxistas_id == 2) {
+                return back()->with('error', 'No puedes cambiar el estado teniendo un servicio activo.');
+            }
+            if ($taxista->estado_taxistas_id == 1) {
+                // Cambiar a ocupado
+                $taxista->estado_taxistas_id = 3;
+
+            } elseif ($taxista->estado_taxistas_id == 3) {
+                // Cambiar disponible
+                $taxista->estado_taxistas_id = 1;
+            }
+            $taxista->save();
+            return back()->with('success', 'Estado de disponibilidad actualizado correctamente.');
+        }
 
 }

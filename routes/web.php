@@ -56,6 +56,9 @@ Route::get('/sobre-nosotros', function () {
     return Inertia::render('SobreNosotros');
 })->name('sobre-nosotros');
 
+Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado'])
+    ->name('taxista.cambiar-estado');
+
 // routes/web.php
 
 require __DIR__.'/auth.php';

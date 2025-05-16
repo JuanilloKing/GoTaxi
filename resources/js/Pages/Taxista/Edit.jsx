@@ -118,13 +118,6 @@ export default function Edit({ taxista }) {
                             <InputError message={errors.email} className="mt-2" />
                         </div>
 
-                        {/* DNI */}
-                        <div className="mt-4">
-                            <InputLabel htmlFor="dni" value="DNI" />
-                            <TextInput id="dni" type="text" value={data.dni} onChange={(e) => setData('dni', e.target.value)} className="mt-1 block w-full" />
-                            <InputError message={dniError || errors.dni} className="mt-2" />
-                        </div>
-
                         {/* Teléfono */}
                         <div className="mt-4">
                             <InputLabel htmlFor="telefono" value="Teléfono" />
