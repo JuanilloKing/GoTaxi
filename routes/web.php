@@ -5,6 +5,7 @@ use App\Http\Controllers\ReservarController;
 use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\LocationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -58,6 +59,10 @@ Route::get('/sobre-nosotros', function () {
 
 Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado'])
     ->name('taxista.cambiar-estado');
+
+Route::get('/api/provincias', [LocationController::class, 'getProvincias']);
+Route::get('/api/municipios/{provinciaId}', [LocationController::class, 'getMunicipios']);
+
 
 // routes/web.php
 

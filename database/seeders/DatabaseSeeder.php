@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\ImportarMunicipiosSeeder;
+use Database\Seeders\ProvinciaSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EstadoTaxistaSeeder::class,
             EstadoReservaSeeder::class,
+            ProvinciaSeeder::class,
+            ImportarMunicipiosSeeder::class,
         ]);
     }
 }

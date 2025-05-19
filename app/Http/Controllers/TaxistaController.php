@@ -27,68 +27,99 @@ class TaxistaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        DB::beginTransaction();
-        try {
+public function store(Request $request)
+{
+    DB::beginTransaction();
+    try {
+        // Validación de los datos con mensajes personalizados
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'dni' => ['sometimes', 'string', 'unique:users,dni', 'regex:/^\d{8}[A-Z]$/'],
+            'telefono' => 'required|string|unique:users,telefono',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8|same:password',
+            'ciudad' => 'required|string|max:255',
+            'licencia_taxi' => 'required|string|max:255|unique:vehiculos,licencia_taxi',
+            'matricula' => 'required|string|max:255|unique:vehiculos,matricula',
+            'marca' => 'required|string|max:255',
+            'modelo' => 'required|string|max:255',
+            'color' => 'required|string|max:255',
+            'capacidad' => 'required|integer|max:255',
+            'minusvalido' => 'required|boolean',
+        ], [
+            'dni.regex' => 'El DNI introducido no es correcto.',
+            'dni.unique' => 'Este DNI ya está registrado.',
+            'telefono.unique' => 'Este teléfono ya está registrado.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'licencia_taxi.unique' => 'Licencia de taxi ya registrada.',
+            'matricula.unique' => 'Vehículo ya registrado.',
+        ]);
 
-            // Validación de los datos
-            $validated = $request->validate([
-                'nombre' => 'required|string|max:255',
-                'apellidos' => 'required|string|max:255',
-                'dni' => ['sometimes', 'string', 'unique:users,dni', 'regex:/^\d{8}[A-Z]$/'],
-                'telefono' => 'required|string|unique:users,telefono',
-                'email' => 'required|email|unique:users,email', 
-                'password' => 'required|string|min:8|confirmed',
-                'password_confirmation' => 'required|string|min:8|same:password', 
-                'ciudad' => 'required|string|max:255',
-                'licencia_taxi' => 'required|string|max:255',
-                'matricula' => 'required|string|max:255',
-                'marca' => 'required|string|max:255',
-                'modelo' => 'required|string|max:255',
-                'color' => 'required|string|max:255',
-                'capacidad' => 'required|integer|max:255', 
-                'minusvalido' => 'required|boolean',
-            ]);
-            $vehiculo = new Vehiculo();
-            $vehiculo->licencia_taxi = $validated['licencia_taxi'];
-            $vehiculo->matricula = $validated['matricula'];
-            $vehiculo->marca = $validated['marca'];
-            $vehiculo->modelo = $validated['modelo'];
-            $vehiculo->color = $validated['color'];
-            $vehiculo->minusvalido = $validated['minusvalido'];
-            $vehiculo->capacidad = $validated['capacidad'];
-            $vehiculo->save();
-                                      
-            $user = new User();
-            $user->nombre = $validated['nombre'];
-            $user->apellidos = $validated['apellidos'];
-            $user->dni = $validated['dni'];
-            $user->telefono = $validated['telefono'];
-            $user->email = $validated['email'];
-            $user->password = Hash::make($validated['password']);
-                // Crear el Taxista
-                $Taxista = new Taxista();
-                $Taxista->ciudad = $validated['ciudad'];
-                $Taxista->vehiculo_id = $vehiculo->id;
-                $Taxista->estado_taxistas_id = 1; 
-                $Taxista->save();
-                $user->tipable()->associate($Taxista);  // Asociar el usuario con el Taxista o taxista
-            $user->save();  // Guardar la relación
-        } catch (\Exception $e) {
-            DB::rollBack();
-            dd($e);
-            Log::error('Error al registrar el usuario: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Error al registrar el usuario.']);
-        }
+        $vehiculo = new Vehiculo();
+        $vehiculo->licencia_taxi = $validated['licencia_taxi'];
+        $vehiculo->matricula = $validated['matricula'];
+        $vehiculo->marca = $validated['marca'];
+        $vehiculo->modelo = $validated['modelo'];
+        $vehiculo->color = $validated['color'];
+        $vehiculo->minusvalido = $validated['minusvalido'];
+        $vehiculo->capacidad = $validated['capacidad'];
+        $vehiculo->save();
+
+        $user = new User();
+        $user->nombre = $validated['nombre'];
+        $user->apellidos = $validated['apellidos'];
+        $user->dni = $validated['dni'];
+        $user->telefono = $validated['telefono'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make($validated['password']);
+
+        $Taxista = new Taxista();
+        $Taxista->ciudad = $validated['ciudad'];
+        $Taxista->vehiculo_id = $vehiculo->id;
+        $Taxista->estado_taxistas_id = 1;
+        $Taxista->save();
+
+        $user->tipable()->associate($Taxista);
+        $user->save();
+
         DB::commit();
 
         event(new Registered($user));
         Auth::login($user);
 
-
         return redirect()->to('/');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        DB::rollBack();
+        return redirect()->back()->withErrors($e->validator)->withInput();
+    } catch (\Illuminate\Database\QueryException $e) {
+        DB::rollBack();
+
+        $message = 'Error al registrar el usuario.';
+        $errorMsg = $e->getMessage();
+
+        // Detectar claves únicas violadas (depende del motor de BD)
+        if (str_contains($errorMsg, 'vehiculos_licencia_taxi_unique')) {
+            $message = 'Licencia de taxi ya registrada.';
+        } elseif (str_contains($errorMsg, 'vehiculos_matricula_unique')) {
+            $message = 'Vehículo ya registrado.';
+        } elseif (str_contains($errorMsg, 'users_dni_unique')) {
+            $message = 'Este DNI ya está registrado.';
+        } elseif (str_contains($errorMsg, 'users_email_unique')) {
+            $message = 'Este correo electrónico ya está registrado.';
+        } elseif (str_contains($errorMsg, 'users_telefono_unique')) {
+            $message = 'Este teléfono ya está registrado.';
+        }
+
+        Log::error('Error en el registro (Query): ' . $e->getMessage());
+        return redirect()->back()->withErrors(['error' => $message])->withInput();
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error inesperado en el registro: ' . $e->getMessage());
+        return redirect()->back()->withErrors(['error' => 'Ocurrió un error inesperado.'])->withInput();
     }
+}
 
     /**
      * Display the specified resource.
