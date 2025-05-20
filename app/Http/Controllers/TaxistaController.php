@@ -40,7 +40,7 @@ public function store(Request $request)
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required|string|min:8|same:password',
-            'ciudad' => 'required|string|max:255',
+            'municipio_id' => 'required',
             'licencia_taxi' => 'required|string|max:255|unique:vehiculos,licencia_taxi',
             'matricula' => 'required|string|max:255|unique:vehiculos,matricula',
             'marca' => 'required|string|max:255',
@@ -76,7 +76,7 @@ public function store(Request $request)
         $user->password = Hash::make($validated['password']);
 
         $Taxista = new Taxista();
-        $Taxista->ciudad = $validated['ciudad'];
+        $Taxista->municipio_id = $validated['municipio_id'];
         $Taxista->vehiculo_id = $vehiculo->id;
         $Taxista->estado_taxistas_id = 1;
         $Taxista->save();
@@ -146,7 +146,7 @@ public function store(Request $request)
             'reservasFinalizadas' => $reservasFinalizadas,
         ]);
     }
-    
+
 
 
     /**
@@ -186,9 +186,8 @@ public function store(Request $request)
             'dni' => 'sometimes|nullable|string|max:20',
             'telefono' => 'sometimes|nullable|string|min:9|max:9',
             'password' => 'sometimes|nullable|string|min:8|confirmed',
-            'ciudad' => 'sometimes|nullable|string|max:255',
+            'municipio_id' => 'sometimes|nullable|string|max:255',
         ]);
-
         // Actualizar campos del usuario
         if (isset($validated['nombre'])) $user->nombre = $validated['nombre'];
         if (isset($validated['apellidos'])) $user->apellidos = $validated['apellidos'];
@@ -200,8 +199,8 @@ public function store(Request $request)
         $user->save();
 
         // Actualizar campos del modelo relacionado (taxista)
-        if (isset($validated['ciudad'])) {
-            $taxista->ciudad = $validated['ciudad'];
+        if (isset($validated['municipio_id'])) {
+            $taxista->municipio = $validated['municipio_id'];
             $taxista->save();
         }
 

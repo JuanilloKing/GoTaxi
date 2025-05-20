@@ -12,7 +12,7 @@ import Header from '@/Components/Header';
 const RegisterTaxista = () => {
   const { data, setData, post, processing, errors } = useForm({
     nombre: '', apellidos: '', telefono: '', dni: '', email: '',
-    password: '', password_confirmation: '', ciudad: '',
+    password: '', password_confirmation: '', municipio_id: '',
     licencia_taxi: '', matricula: '', marca: '', modelo: '',
     color: '', capacidad: '', minusvalido: false,
   });
@@ -36,7 +36,7 @@ const RegisterTaxista = () => {
         .then(data => setMunicipios(data));
     } else {
       setMunicipios([]);
-      setData('ciudad', '');
+      setData('municipio_id', '');
     }
   }, [selectedProvincia]);
 
@@ -86,7 +86,7 @@ const RegisterTaxista = () => {
                 >
                   <option value="">Selecciona una provincia</option>
                   {provincias.map((prov) => (
-                    <option key={prov.id_provincia} value={prov.id_provincia}>
+                    <option key={prov.id} value={prov.id}>
                       {prov.provincia}
                     </option>
                   ))}
@@ -95,19 +95,19 @@ const RegisterTaxista = () => {
 
               {/* Select Municipio */}
               <div>
-                <InputLabel htmlFor="ciudad" value="Municipio" />
+                <InputLabel htmlFor="municipio_id" value="Municipio" />
                 <select
-                  name="ciudad"
-                  id="ciudad"
+                  name="municipio_id"
+                  id="municipio_id"
                   className="mt-1 block w-full border-gray-300 rounded-md"
-                  value={data.ciudad}
+                  value={data.municipio_id}
                   onChange={handleChange}
                   required
                   disabled={!selectedProvincia}
                 >
                   <option value="">Selecciona un municipio</option>
                   {municipios.map((mun) => (
-                    <option key={mun.id} value={mun.municipio}>
+                    <option key={mun.id} value={mun.id}>
                       {mun.municipio}
                     </option>
                   ))}

@@ -15,4 +15,10 @@ class Municipio extends Model
     {
         return $this->belongsTo(Provincia::class, 'id_provincia');
     }
+
+    public function taxistas()
+    {
+        return $this->hasMany(Taxista::class);
+    }
+
 }

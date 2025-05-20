@@ -45,18 +45,20 @@ class ReservarController extends Controller
         $response = $client->get($url);
         $data = json_decode($response->getBody()->getContents(), true);
         $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
-        
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
         
-        $taxista = Taxista::where('ciudad', $ciudadOrigen)
-        ->where('estado_taxistas_id', 1)
-        ->whereHas('vehiculo', function ($query) use ($request) {
-            $query->where('disponible', true) // Verificar si el vehículo está disponible
-                  ->where('capacidad', '>=', $request->pasajeros); // Verificar si la capacidad del vehículo es suficiente
-        })
-        ->orderByRaw('COALESCE(ultimo_viaje, \'1970-01-01 00:00:00\') DESC, ultimo_viaje ASC, created_at ASC')
-        ->first();
+        $taxista = Taxista::where('estado_taxistas_id', 1)
+            ->whereHas('municipio', function ($query) use ($ciudadOrigen) {
+                $query->where('municipio', $ciudadOrigen); // o 'nombre', según tu campo
+            })
+            ->whereHas('vehiculo', function ($query) use ($request) {
+                $query->where('disponible', true)
+                    ->where('capacidad', '>=', $request->pasajeros);
+            })
+            ->orderByRaw("COALESCE(ultimo_viaje, '1970-01-01 00:00:00') ASC")
+            ->orderBy('created_at', 'ASC')
+            ->first();
         
         if ($taxista == null) {
             return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');

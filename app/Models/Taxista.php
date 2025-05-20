@@ -24,14 +24,19 @@ class Taxista extends Model
     }
 
     public function reservas()
-{
-    return $this->hasMany(Reserva::class);
-}
+    {
+        return $this->hasMany(Reserva::class);
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class);
+    }
 
 
     protected $fillable = [
         'vehiculo_id',
-        'ciudad',
+        'municipio_id',
         'ultimo_viaje', 
     ];
 }
