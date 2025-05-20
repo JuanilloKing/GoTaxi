@@ -57,6 +57,14 @@ Route::get('/sobre-nosotros', function () {
     return Inertia::render('SobreNosotros');
 })->name('sobre-nosotros');
 
+Route::get('/empresas', function () {
+    return Inertia::render('Empresas');
+})->name('empresas');
+
+Route::get('/contactos', function () {
+    return Inertia::render('Contactos');
+})->name('contactos');
+
 Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado'])
     ->name('taxista.cambiar-estado');
 

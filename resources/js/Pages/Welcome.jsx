@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
 import React from "react";
+import Ventajas from '@/Components/Ventajas';
 import {
   Accordion,
   AccordionHeader,
@@ -175,7 +176,42 @@ export default function Welcome({ auth }) {
             </div>
           </div>
         </div>
+        {/* Sección 3: visible para todos */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-black mb-4">Empresas</h2>
+              <p className="text-gray-600 mb-6">Ponte en contacto con nosotros como empresa, y tendras a disposición tu flota de taxis de confianza.</p>
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                <Link
+                  href="/empresas"
+                  className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
+                >
+                  Mas información
+                </Link>
+                <Link
+                  href="/contactos"
+                  className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
+                >
+                  Contáctanos
+                </Link>
+              </div>
+            </div>
+            <div>
+              <img
+                src="/images/empresas.jpg"
+                alt="Reserva un taxi"
+                className="rounded-xl shadow-xl"
+              />
+            </div>
+          </div>
         <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <img
+          src="/images/pregFrec.jpg"
+          alt="Reserva un taxi"
+          className="rounded-xl shadow-xl"
+        />
+        </div>
           <div>
             <h2 className="text-4xl font-bold mb-4">Preguntas frecuentes</h2>
         <Accordion open={open === 1} icon={<Icon id={1} open={open} />}>
@@ -217,15 +253,9 @@ export default function Welcome({ auth }) {
         </AccordionBody>
       </Accordion>
       </div>
-      <div>
-        <img
-          src="/images/pregFrec.jpg"
-          alt="Reserva un taxi"
-          className="rounded-xl shadow-xl"
-        />
-            </div>
       </div>
       </div>
+      <Ventajas />
     </Principal>
   )
 }
