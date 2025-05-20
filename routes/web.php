@@ -5,6 +5,7 @@ use App\Http\Controllers\ReservarController;
 use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ConsultaTarifaController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TarifaController;
 use App\Http\Middleware\AdminMiddleware;
@@ -82,6 +83,9 @@ Route::get('/admin/tarifas', [TarifaController::class, 'index'])
 Route::put('/admin/tarifas/{id}', [TarifaController::class, 'update'])
     ->middleware(AdminMiddleware::class)
     ->name('tarifas.update');
+
+Route::get('/consultar-tarifa', [ConsultaTarifaController::class, 'index'])
+    ->name('tarifas.consultar');
 
 // routes/web.php
 

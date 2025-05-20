@@ -1,31 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
-import FlashMessage from '@/Components/FlashMensaje';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 
 const Index = () => {
-  const { provincias, filters } = usePage().props;
-
+  const { provincias, filters = {}, editable = false } = usePage().props;
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
-  const [sortAsc, setSortAsc] = useState(filters.sort === 'asc');
-  const { flash } = usePage().props;
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [sortAsc, setSortAsc] = useState((filters?.sort || 'asc') !== 'desc');
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      router.get(
-        route('tarifas.index'),
-        { search: searchTerm, sort: sortAsc ? 'asc' : 'desc' },
-        { preserveState: true, replace: true }
-      );
-    }, 300);
+  const [editingId, setEditingId] = editable ? useState(null) : [null, () => {}];
+  const [formData, setFormData] = editable ? useState({}) : [{}, () => {}];
 
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, sortAsc]);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    router.get(route(route().current()), {
+      search: value,
+      sort: sortAsc ? 'asc' : 'desc',
+    }, { preserveState: true, replace: true });
+  };
+
+  const handleSortToggle = () => {
+    const newSort = !sortAsc;
+    setSortAsc(newSort);
+
+    router.get(route(route().current()), {
+      search: searchTerm,
+      sort: newSort ? 'asc' : 'desc',
+    }, { preserveState: true, replace: true });
+  };
 
   const startEditing = (provincia) => {
+    if (!editable) return;
     setEditingId(provincia.id);
     setFormData({
       precio_km: provincia.precio_km,
@@ -34,10 +41,12 @@ const Index = () => {
   };
 
   const handleInputChange = (e) => {
+    if (!editable) return;
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const saveEdit = (id) => {
+    if (!editable) return;
     router.put(`/admin/tarifas/${id}`, formData, {
       onSuccess: () => setEditingId(null),
     });
@@ -46,9 +55,6 @@ const Index = () => {
   return (
     <>
       <Header />
-        {/* Modal de éxito */}
-        <FlashMessage message={flash.success} type="success" />
-        <FlashMessage message={flash.error} type="error" />
       <main className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Tarifas por Provincia</h1>
 
@@ -58,11 +64,11 @@ const Index = () => {
             type="text"
             placeholder="Buscar provincia..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             className="border border-gray-300 rounded px-4 py-2 w-full sm:w-1/2"
           />
           <button
-            onClick={() => setSortAsc(!sortAsc)}
+            onClick={handleSortToggle}
             className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
           >
             Ordenar {sortAsc ? 'A-Z' : 'Z-A'}
@@ -77,7 +83,7 @@ const Index = () => {
                 <th className="border px-4 py-2 text-left">Provincia</th>
                 <th className="border px-4 py-2 text-left">Precio por KM</th>
                 <th className="border px-4 py-2 text-left">Precio por Hora</th>
-                <th className="border px-4 py-2 text-left">Editar</th>
+                {editable && <th className="border px-4 py-2 text-left">Editar</th>}
               </tr>
             </thead>
             <tbody>
@@ -85,7 +91,7 @@ const Index = () => {
                 <tr key={provincia.id}>
                   <td className="border px-4 py-2">{provincia.nombre}</td>
                   <td className="border px-4 py-2">
-                    {editingId === provincia.id ? (
+                    {editable && editingId === provincia.id ? (
                       <input
                         type="number"
                         step="0.01"
@@ -99,7 +105,7 @@ const Index = () => {
                     )}
                   </td>
                   <td className="border px-4 py-2">
-                    {editingId === provincia.id ? (
+                    {editable && editingId === provincia.id ? (
                       <input
                         type="number"
                         step="0.01"
@@ -112,28 +118,30 @@ const Index = () => {
                       provincia.precio_hora
                     )}
                   </td>
-                  <td className="border px-4 py-2">
-                    {editingId === provincia.id ? (
-                      <button
-                        onClick={() => saveEdit(provincia.id)}
-                        className="text-green-600 hover:underline"
-                      >
-                        Guardar
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => startEditing(provincia)}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Editar
-                      </button>
-                    )}
-                  </td>
+                  {editable && (
+                    <td className="border px-4 py-2">
+                      {editingId === provincia.id ? (
+                        <button
+                          onClick={() => saveEdit(provincia.id)}
+                          className="text-green-600 hover:underline"
+                        >
+                          Guardar
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => startEditing(provincia)}
+                          className="text-blue-600 hover:underline"
+                        >
+                          Editar
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
               {provincias.data.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center py-4 text-gray-500">
+                  <td colSpan={editable ? 4 : 3} className="text-center py-4 text-gray-500">
                     No se encontraron provincias.
                   </td>
                 </tr>
@@ -142,7 +150,21 @@ const Index = () => {
           </table>
         </div>
 
-
+        {/* Paginación */}
+        <div className="mt-6 flex justify-center space-x-2">
+          {provincias.links.map((link, index) => (
+            <Link
+              key={index}
+              href={link.url || '#'}
+              className={`px-3 py-1 rounded text-sm ${
+                link.active
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              } ${!link.url ? 'pointer-events-none opacity-50' : ''}`}
+              dangerouslySetInnerHTML={{ __html: link.label }}
+            />
+          ))}
+        </div>
       </main>
       <Footer />
     </>

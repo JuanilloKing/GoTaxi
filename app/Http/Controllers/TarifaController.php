@@ -34,6 +34,7 @@ class TarifaController extends Controller
 
         return Inertia::render('Admin/Tarifa/Index', [
             'provincias' => $provinciasConTarifas,
+            'editable' => true,
             'filters' => [
                 'search' => $search,
                 'sort' => $sort,
