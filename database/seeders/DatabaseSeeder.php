@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             EstadoReservaSeeder::class,
             ProvinciaSeeder::class,
             ImportarMunicipiosSeeder::class,
+            TarifaSeeder::class,
         ]);
     }
 }

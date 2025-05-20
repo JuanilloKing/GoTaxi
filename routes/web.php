@@ -6,6 +6,9 @@ use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\TarifaController;
+use App\Http\Middleware\AdminMiddleware;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,6 +74,14 @@ Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado
 Route::get('/api/provincias', [LocationController::class, 'getProvincias']);
 Route::get('/api/municipios/{provinciaId}', [LocationController::class, 'getMunicipios']);
 
+
+Route::get('/admin/tarifas', [TarifaController::class, 'index'])
+    ->name('tarifas.index')
+    ->middleware(AdminMiddleware::class);
+
+Route::put('/admin/tarifas/{id}', [TarifaController::class, 'update'])
+    ->middleware(AdminMiddleware::class)
+    ->name('tarifas.update');
 
 // routes/web.php
 
