@@ -16,8 +16,8 @@ const Create = () => {
   const [directions, setDirections] = useState(null);
   const [distancia, setDistancia] = useState(null);
   const [duracion, setDuracion] = useState(null);
-  const tarifa_km = 1.26;
-  const tarifa_min = 0.2;
+  const [tarifa, setTarifa] = useState({ precio_km: 0, precio_hora: 0 });
+
 
   const { flash } = usePage().props;
   const errorMessage = flash?.error;
@@ -51,7 +51,7 @@ const Create = () => {
     formData.append('destino', destination);
     formData.append('distancia', distancia);
     formData.append('duracion', duracion);
-    formData.append('precio', ((distancia * tarifa_km) + (duracion * tarifa_min)).toFixed(2));
+    formData.append('precio', data.precio);
     formData.append('minusvalido', data.minusvalido);
     formData.append('anotaciones', data.anotaciones);
     formData.append('pasajeros', data.pasajeros);
@@ -61,31 +61,56 @@ const Create = () => {
     router.post(route('reservar.store'), formData);
   };
 
-  const calculateRoute = async () => {
-    if (!originRef.current.value || !destinationRef.current.value) return;
-    const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirections(results);
-    setOrigin(originRef.current.value);
-    setDestination(destinationRef.current.value);
+const calculateRoute = async () => {
+  if (!originRef.current.value || !destinationRef.current.value) return;
 
-    const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
-    const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
-    setDistancia(km);
-    setDuracion(min);
+  const directionsService = new google.maps.DirectionsService();
+  const results = await directionsService.route({
+    origin: originRef.current.value,
+    destination: destinationRef.current.value,
+    travelMode: google.maps.TravelMode.DRIVING,
+  });
 
-    // Obtener latitud y longitud de los puntos de origen y destino
-    const originLatLng = results.routes[0].legs[0].start_location;
-    const destinationLatLng = results.routes[0].legs[0].end_location;
-    
-    // Enviar las coordenadas junto con los demás datos del formulario
-    setData('lat_origen', originLatLng.lat());
-    setData('lon_origen', originLatLng.lng());
-  };
+  setDirections(results);
+  setOrigin(originRef.current.value);
+  setDestination(destinationRef.current.value);
+
+  const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
+  const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
+  setDistancia(km);
+  setDuracion(min);
+
+  // Obtener lat y lon de origen
+  const originLatLng = results.routes[0].legs[0].start_location;
+  setData('lat_origen', originLatLng.lat());
+  setData('lon_origen', originLatLng.lng());
+
+  // Obtener la provincia con Geocoder
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ location: originLatLng }, async (geocodeResults, status) => {
+    if (status === "OK" && geocodeResults[0]) {
+      const components = geocodeResults[0].address_components;
+      const provinciaOrigen = components.find(c => c.types.includes("administrative_area_level_2"))?.long_name;
+
+      if (provinciaOrigen) {
+        try {
+          const response = await fetch(`/api/tarifas/${encodeURIComponent(provinciaOrigen)}`); // ✅ CORRECTO
+          const data = await response.json();
+
+          if (data.precio_km && data.precio_hora) {
+            setTarifa({ precio_km: data.precio_km, precio_hora: data.precio_hora });
+
+            const precioCalculado = (km * data.precio_km + min * (data.precio_hora / 60)).toFixed(2);
+            setData('precio', precioCalculado);
+          }
+        } catch (error) {
+          console.error("Error al obtener tarifa:", error);
+        }
+      }
+    }
+  });
+};
+
   
   const clearRoute = () => {
     setDirections(null);
@@ -160,7 +185,7 @@ const Create = () => {
             <div className="mt-4 text-lg font-semibold text-gray-800 bg-gray-100 p-4 rounded text-center">
               Distancia estimada: {distancia} km <br />
               Duración estimada: {duracion} minutos <br />
-              Precio estimado: {((distancia * tarifa_km) + (duracion * tarifa_min)).toFixed(2)} €
+              Precio estimado: {data.precio} €
             </div>
           )}
           <form className="mt-4 space-y-4" onSubmit={handleSubmit}>

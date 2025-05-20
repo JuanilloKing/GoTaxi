@@ -59,10 +59,10 @@ class ReservarController extends Controller
             ->orderByRaw("COALESCE(ultimo_viaje, '1970-01-01 00:00:00') ASC")
             ->orderBy('created_at', 'ASC')
             ->first();
+            if ($taxista == null) {
+                return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
+            }
 
-        if ($taxista == null) {
-            return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
-        }
 
         $confirmada = 2;
         try {

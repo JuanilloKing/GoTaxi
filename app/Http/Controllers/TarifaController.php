@@ -100,4 +100,29 @@ class TarifaController extends Controller
     {
         //
     }
+
+public function getTarifaPorProvincia($provincia)
+{
+    // Normaliza nombre de provincia recibido
+    $provincia = ucfirst(strtolower($provincia));
+
+    $tarifa = DB::table('provincias')
+        ->leftJoin('tarifas', 'provincias.id', '=', 'tarifas.provincia_id')
+        ->select(
+            DB::raw('COALESCE(tarifas.precio_km, 1.26) as precio_km'),
+            DB::raw('COALESCE(tarifas.precio_hora, 0.2) as precio_hora')
+        )
+        ->where('provincias.provincia', $provincia)
+        ->first();
+
+    if (!$tarifa) {
+        return response()->json(['error' => 'Provincia no encontrada'], 404);
+    }
+
+    return response()->json([
+        'precio_km' => $tarifa->precio_km,
+        'precio_hora' => $tarifa->precio_hora
+    ]);
+}
+
 }
