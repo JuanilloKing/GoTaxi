@@ -13,4 +13,3 @@ class ImportarMunicipiosSeeder extends Seeder
         DB::unprepared($sql);
     }
 }
-

@@ -15,4 +15,10 @@ class Provincia extends Model
     {
         return $this->hasMany(Municipio::class, 'provincia_id');
     }
+
+    public function tarifa()
+    {
+    return $this->hasOne(Tarifa::class);
+    }
+
 }

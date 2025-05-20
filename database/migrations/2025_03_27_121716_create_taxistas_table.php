@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('vehiculo_id'); 
             $table->foreign('vehiculo_id')->references('id')->on('vehiculos');
             $table->timestamp('ultimo_viaje')->nullable();
-            $table->string('ciudad');
+            $table->foreignId('municipio_id')->constrained('municipios');
             $table->foreignId('estado_taxistas_id')->constrained('estado_taxistas')->nullable();
             $table->timestamps();
         });

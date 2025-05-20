@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('provincias', function (Blueprint $table) {
-            $table->smallInteger('id_provincia')->primary();
+            $table->id();
             $table->string('provincia', 30)->nullable();
         });
     }

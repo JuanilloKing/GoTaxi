@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ciudades', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre')->unique();
-            $table->timestamps();
-        });
+    Schema::create('tarifas', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('provincia_id')->constrained();
+        $table->decimal('precio_km', 8, 2)->default(0);
+        $table->decimal('precio_hora', 8, 2)->default(0);
+        $table->timestamps();
+    });     
     }
 
     /**
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ciudades');
+        Schema::dropIfExists('tarifas');
     }
 };

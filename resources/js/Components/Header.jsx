@@ -132,7 +132,16 @@ export default function Header() {
                       Editar perfil
                     </Link>
                   </li>
-
+                  {user?.is_admin && (
+                  <li>
+                    <Link
+                      href="/admin/tarifas"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                    >
+                      Editar tarifas
+                    </Link>
+                  </li>
+                )}
                   <li>
                     <Link
                       href="/logout"
