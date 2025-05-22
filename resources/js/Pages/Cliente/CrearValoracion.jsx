@@ -8,7 +8,7 @@ export default function CrearValoracion({ reserva }) {
     reserva_id: reserva.id,
     cliente_id: reserva.cliente_id,
     taxista_id: reserva.taxista_id,
-    puntuacion: 5,
+    puntuacion: 0,
     comentario: '',
   });
 
@@ -16,7 +16,7 @@ export default function CrearValoracion({ reserva }) {
     e.preventDefault();
     post(route('valoraciones.store'));
   };
-
+  
   return (
     <div>
       <Header />
