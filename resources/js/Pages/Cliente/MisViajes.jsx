@@ -59,6 +59,19 @@ export default function MisViajes({ auth, reservas }) {
                       <p><strong>Destino:</strong> {reserva.destino}</p>
                       <p><strong>Pasajeros:</strong> {reserva.num_pasajeros}</p>
                       <p><strong>Estado:</strong> <span className="capitalize">{reserva.estado_reservas.estado}</span></p>
+                      {/* Valoración */}
+                      <div className="col-span-2 mt-2">
+                        {reserva.valoracion ? (
+                          <p className="text-green-600 font-semibold">✅ Reseña realizada correctamente</p>
+                        ) : (
+                          <Link
+                            href={route('valoraciones.create', reserva.id)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            Déjanos tu opinión sobre el servicio
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </li>
                 ))}

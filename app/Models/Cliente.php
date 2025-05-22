@@ -13,4 +13,10 @@ class Cliente extends Model
     public function user() {
         return $this->morphOne(User::class, 'tipable');
     }
+
+    public function valoraciones()
+    {
+        return $this->hasMany(Valoracion::class);
+    }
+
 }

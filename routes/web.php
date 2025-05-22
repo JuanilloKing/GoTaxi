@@ -6,6 +6,7 @@ use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultaTarifaController;
+use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TarifaController;
 use App\Http\Middleware\AdminMiddleware;
@@ -86,6 +87,12 @@ Route::put('/admin/tarifas/{id}', [TarifaController::class, 'update'])
 
 Route::get('/consultar-tarifa', [ConsultaTarifaController::class, 'index'])
     ->name('tarifas.consultar');
+
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/valoraciones/crear/{reserva}', [ValoracionController::class, 'create'])->name('valoraciones.create');
+    Route::post('/valoraciones', [ValoracionController::class, 'store'])->name('valoraciones.store');
+});
 
 // routes/web.php
 

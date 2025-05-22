@@ -46,5 +46,10 @@ class Reserva extends Model
     {
         return $this->hasOne(Vehiculo::class, 'id', 'vehiculo_id');
     }
+
+    public function valoracion()
+    {
+        return $this->hasOne(Valoracion::class);
+    }
     
 }

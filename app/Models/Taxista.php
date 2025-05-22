@@ -33,6 +33,11 @@ class Taxista extends Model
         return $this->belongsTo(Municipio::class);
     }
 
+    public function valoraciones()
+{
+    return $this->hasMany(Valoracion::class);
+}
+
 
     protected $fillable = [
         'vehiculo_id',
