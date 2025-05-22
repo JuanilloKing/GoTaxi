@@ -59,6 +59,12 @@ const Create = () => {
   const calculateRoute = async () => {
     if (!originRef.current.value || !destinationRef.current.value) return;
 
+    if (originRef.current.value === destinationRef.current.value) {
+      alert('El origen y el destino son iguales.');
+      return;
+      
+    }
+
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
       origin: originRef.current.value,
