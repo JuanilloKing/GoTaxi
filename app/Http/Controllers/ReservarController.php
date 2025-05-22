@@ -114,4 +114,19 @@ class ReservarController extends Controller
 
         return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
     }
+
+    public function cancelado(Reserva $reserva)
+    {
+        $reserva->update(['estado_reservas_id' => 3]);
+
+        $taxista = $reserva->taxista;
+
+        $taxista->estado_taxistas_id = 1;
+        $taxista->vehiculo->disponible = true;
+        $taxista->vehiculo->save();
+        $taxista->save();
+        $reserva->save();
+
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
+    }
 }

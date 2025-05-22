@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('valoraciones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('taxista_id')->constrained('taxistas');
-            $table->foreignId('cliente_id')->constrained('clientes');
             $table->foreignId('reserva_id')->constrained('reservas')->unique();
             $table->integer('puntuacion');
             $table->string('comentario')->nullable();

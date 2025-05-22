@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reserva;
-use App\Models\Valoracion;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -42,7 +41,6 @@ class ValoracionController extends Controller
 
 public function store(Request $request)
     {
-        // Validación                               PROTECTED FILLABLE EN VALORACION.PHP
         $data = $request->validate([
             'reserva_id' => 'required|exists:reservas,id',
             'puntuacion' => 'required|integer|min:1|max:5',
@@ -61,7 +59,7 @@ public function store(Request $request)
         }
 
         $reserva->valoracion()->create([
-            'cliente_id' => $user->tipable_id,
+            'cliente_id' => $user->id,
             'taxista_id' => $reserva->taxista_id,
             'puntuacion' => $data['puntuacion'],
             'comentario' => $data['comentario'],

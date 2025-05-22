@@ -47,6 +47,8 @@ Route::post('/reservar', [ReservarController::class, 'store'])->middleware('auth
 
 Route::post('/reservas/{reserva}/finalizar', [ReservarController::class, 'finalizar'])->name('reservas.finalizar');
 
+Route::post('/reservas/{reserva}/cancelado', [ReservarController::class, 'cancelado'])->name('reservas.cancelado');
+
 Route::get('/taxista/editar', [TaxistaController::class, 'edit'])->name('taxista.edit');
 
 Route::put('/taxista/editar', [TaxistaController::class, 'update'])->name('taxista.update')->middleware('auth');

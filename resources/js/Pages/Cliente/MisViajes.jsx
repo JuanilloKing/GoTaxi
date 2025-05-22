@@ -4,11 +4,11 @@ import Header from '@/Components/Header';
 
 export default function MisViajes({ auth, reservas }) {
   const reservaActiva = reservas.data.find(r => r.estado_reservas_id === 2);
-  const reservasAnteriores = reservas.data.filter(r => r.estado !== 'activa');
+  const reservasAnteriores = reservas.data.filter(r => r.estado_reservas_id !== 2);
 
-  const finalizarReserva = (id) => {
+  const cancelarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
-      router.post(route('reservas.finalizar', id));
+      router.post(route('reservas.cancelado', id));
     }
   };
 
@@ -33,7 +33,7 @@ export default function MisViajes({ auth, reservas }) {
             </div>
             <button
               className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-              onClick={() => finalizarReserva(reservaActiva.id)}
+              onClick={() => cancelarReserva(reservaActiva.id)}
             >
               Cancelar Reserva
             </button>
@@ -61,7 +61,9 @@ export default function MisViajes({ auth, reservas }) {
                       <p><strong>Estado:</strong> <span className="capitalize">{reserva.estado_reservas.estado}</span></p>
                       {/* Valoración */}
                       <div className="col-span-2 mt-2">
-                        {reserva.valoracion ? (
+                        {reserva.estado_reservas_id === 3 ? (
+                          <p className="text-red-600 font-semibold">❌ No puedes calificar servicios cancelados</p>
+                        ) : reserva.valoracion ? (
                           <p className="text-green-600 font-semibold">✅ Reseña realizada correctamente</p>
                         ) : (
                           <Link

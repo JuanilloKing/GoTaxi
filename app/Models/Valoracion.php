@@ -12,6 +12,12 @@ class Valoracion extends Model
 
     protected $table = 'valoraciones';
 
+    protected $fillable = [
+        'reserva_id',
+        'puntuacion',
+        'comentario',
+    ];
+
     public function taxista()
     {
         return $this->belongsTo(Taxista::class);
