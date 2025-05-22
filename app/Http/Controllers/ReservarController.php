@@ -47,7 +47,6 @@ class ReservarController extends Controller
         $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
-        
         $taxista = Taxista::where('estado_taxistas_id', 1)
             ->whereHas('municipio', function ($query) use ($ciudadOrigen) {
                 $query->where('municipio', $ciudadOrigen); // o 'nombre', según tu campo
@@ -59,6 +58,7 @@ class ReservarController extends Controller
             ->orderByRaw("COALESCE(ultimo_viaje, '1970-01-01 00:00:00') ASC")
             ->orderBy('created_at', 'ASC')
             ->first();
+
             if ($taxista == null) {
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
             }

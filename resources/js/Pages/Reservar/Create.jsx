@@ -6,7 +6,6 @@ import { useForm, router } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
 
-
 const centerDefault = { lat: 36.5, lng: -6.0 };
 
 const Create = () => {
@@ -18,11 +17,7 @@ const Create = () => {
   const [duracion, setDuracion] = useState(null);
   const [tarifa, setTarifa] = useState({ precio_km: 0, precio_hora: 0 });
 
-
   const { flash } = usePage().props;
-  const errorMessage = flash?.error;
-  const successMessage = flash?.success;
-
   const originRef = useRef();
   const destinationRef = useRef();
 
@@ -61,57 +56,54 @@ const Create = () => {
     router.post(route('reservar.store'), formData);
   };
 
-const calculateRoute = async () => {
-  if (!originRef.current.value || !destinationRef.current.value) return;
+  const calculateRoute = async () => {
+    if (!originRef.current.value || !destinationRef.current.value) return;
 
-  const directionsService = new google.maps.DirectionsService();
-  const results = await directionsService.route({
-    origin: originRef.current.value,
-    destination: destinationRef.current.value,
-    travelMode: google.maps.TravelMode.DRIVING,
-  });
+    const directionsService = new google.maps.DirectionsService();
+    const results = await directionsService.route({
+      origin: originRef.current.value,
+      destination: destinationRef.current.value,
+      travelMode: google.maps.TravelMode.DRIVING,
+    });
 
-  setDirections(results);
-  setOrigin(originRef.current.value);
-  setDestination(destinationRef.current.value);
+    setDirections(results);
+    setOrigin(originRef.current.value);
+    setDestination(destinationRef.current.value);
 
-  const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
-  const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
-  setDistancia(km);
-  setDuracion(min);
+    const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
+    const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
+    setDistancia(km);
+    setDuracion(min);
 
-  // Obtener lat y lon de origen
-  const originLatLng = results.routes[0].legs[0].start_location;
-  setData('lat_origen', originLatLng.lat());
-  setData('lon_origen', originLatLng.lng());
+    const originLatLng = results.routes[0].legs[0].start_location;
+    setData('lat_origen', originLatLng.lat());
+    setData('lon_origen', originLatLng.lng());
 
-  // Obtener la provincia con Geocoder
-  const geocoder = new google.maps.Geocoder();
-  geocoder.geocode({ location: originLatLng }, async (geocodeResults, status) => {
-    if (status === "OK" && geocodeResults[0]) {
-      const components = geocodeResults[0].address_components;
-      const provinciaOrigen = components.find(c => c.types.includes("administrative_area_level_2"))?.long_name;
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: originLatLng }, async (geocodeResults, status) => {
+      if (status === "OK" && geocodeResults[0]) {
+        const components = geocodeResults[0].address_components;
+        const provinciaOrigen = components.find(c => c.types.includes("administrative_area_level_2"))?.long_name;
 
-      if (provinciaOrigen) {
-        try {
-          const response = await fetch(`/api/tarifas/${encodeURIComponent(provinciaOrigen)}`); // ✅ CORRECTO
-          const data = await response.json();
+        if (provinciaOrigen) {
+          try {
+            const response = await fetch(`/api/tarifas/${encodeURIComponent(provinciaOrigen)}`);
+            const data = await response.json();
 
-          if (data.precio_km && data.precio_hora) {
-            setTarifa({ precio_km: data.precio_km, precio_hora: data.precio_hora });
+            if (data.precio_km && data.precio_hora) {
+              setTarifa({ precio_km: data.precio_km, precio_hora: data.precio_hora });
 
-            const precioCalculado = (km * data.precio_km + min * (data.precio_hora / 60)).toFixed(2);
-            setData('precio', precioCalculado);
+              const precioCalculado = (km * data.precio_km + min * (data.precio_hora / 60)).toFixed(2);
+              setData('precio', precioCalculado);
+            }
+          } catch (error) {
+            console.error("Error al obtener tarifa:", error);
           }
-        } catch (error) {
-          console.error("Error al obtener tarifa:", error);
         }
       }
-    }
-  });
-};
+    });
+  };
 
-  
   const clearRoute = () => {
     setDirections(null);
     originRef.current.value = '';
@@ -119,25 +111,27 @@ const calculateRoute = async () => {
     setOrigin('');
     setDestination('');
   };
-  
+
   if (!isLoaded) return <div>Loading...</div>;
-  
+
   return (
     <div>
       <Header />
       <FlashMessage message={flash.success} type="success" />
-      <FlashMessage message={flash.error} type="error" />        
-      <div style={{ display: 'flex', height: '100vh' }}>
-        <div style={{ flex: 1, padding: '20px' }}>
-          <h1>Elige tu destino</h1>
+      <FlashMessage message={flash.error} type="error" />
+
+      <div className="flex flex-col md:flex-row min-h-screen">
+        {/* Mapa y dirección */}
+        <div className="w-full md:w-1/2 p-4">
+          <h1 className="text-xl font-bold mb-4">Elige tu destino</h1>
           <div className="space-y-4">
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Autocomplete>
                 <input
                   type="text"
                   placeholder="Origen..."
                   ref={originRef}
-                  className="border p-2 rounded w-64"
+                  className="border p-2 rounded w-full md:w-64"
                 />
               </Autocomplete>
               <Autocomplete>
@@ -145,32 +139,32 @@ const calculateRoute = async () => {
                   type="text"
                   placeholder="Destino..."
                   ref={destinationRef}
-                  className="border p-2 rounded w-64"
+                  className="border p-2 rounded w-full md:w-64"
                 />
               </Autocomplete>
-              <button className="bg-blue-500 text-white p-2 rounded" onClick={calculateRoute}>
-                Mostrar Ruta
-              </button>
-              <button className="bg-gray-400 text-white p-2 rounded" onClick={clearRoute}>
-                Limpiar
-              </button>
+              <div className="flex gap-2">
+                <button className="bg-blue-500 text-white p-2 rounded w-full md:w-auto" onClick={calculateRoute}>
+                  Mostrar Ruta
+                </button>
+                <button className="bg-gray-400 text-white p-2 rounded w-full md:w-auto" onClick={clearRoute}>
+                  Limpiar
+                </button>
+              </div>
             </div>
 
-            <div className="relative h-[500px] w-full">
+            <div className="relative w-full h-72 md:h-[500px]">
               <GoogleMap
                 center={centerDefault}
                 zoom={6}
-                mapContainerStyle={{ width: '100%', height: '500px' }}
+                mapContainerStyle={{ width: '100%', height: '100%' }}
                 onLoad={(map) => setMap(map)}
-                options={
-                  {
-                    disableDefaultUI: true,
-                    zoomControl: true,
-                    streetViewControl: false,
-                    mapTypeControl: false,
-                    fullscreenControl: false,
-                  }
-                }
+                options={{
+                  disableDefaultUI: true,
+                  zoomControl: true,
+                  streetViewControl: false,
+                  mapTypeControl: false,
+                  fullscreenControl: false,
+                }}
               >
                 {directions && <DirectionsRenderer directions={directions} />}
               </GoogleMap>
@@ -179,23 +173,23 @@ const calculateRoute = async () => {
         </div>
 
         {/* Formulario */}
-        <div style={{ flex: 1, padding: '20px', backgroundColor: '#f9f9f9', marginTop: '40px', marginLeft: '20px', borderRadius: '8px' }}>
-          <h1>Formulario de Reserva</h1>
+        <div className="w-full md:w-1/2 p-4 bg-gray-100 mt-6 md:mt-10 rounded">
+          <h1 className="text-xl font-bold mb-4">Formulario de Reserva</h1>
           {distancia && duracion && (
-            <div className="mt-4 text-lg font-semibold text-gray-800 bg-gray-100 p-4 rounded text-center">
-              Distancia estimada: {distancia} km <br />
-              Duración estimada: {duracion} minutos <br />
-              Precio estimado: {data.precio} €
+            <div className="text-lg font-semibold text-gray-800 bg-white p-4 rounded text-center shadow">
+              Distancia: {distancia} km <br />
+              Duración: {duracion} min <br />
+              Precio: {data.precio} €
             </div>
           )}
           <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  className="form-checkbox" 
-                  checked={data.minusvalido} 
-                  onChange={(e) => setData('minusvalido', e.target.checked)} 
+                <input
+                  type="checkbox"
+                  className="form-checkbox"
+                  checked={data.minusvalido}
+                  onChange={(e) => setData('minusvalido', e.target.checked)}
                 />
                 <span>Taxi minusválido</span>
               </label>
@@ -220,17 +214,17 @@ const calculateRoute = async () => {
               ></textarea>
             </div>
             {distancia && duracion && (
-              <div className="flex justify-between mt-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between mt-4">
                 <button
                   type="submit"
                   disabled={processing}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                 >
                   Reservar taxi ahora
                 </button>
                 <button
                   type="button"
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full sm:w-auto"
                 >
                   Programar fecha y hora
                 </button>
