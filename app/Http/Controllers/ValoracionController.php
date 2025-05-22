@@ -17,9 +17,14 @@ class ValoracionController extends Controller
             abort(403, 'No tienes permiso para valorar esta reserva.');
         }
 
+            // Verificar si el estado es cancelado (id === 3)
+        if ($reserva->estado_reservas_id === 3) {
+            return redirect()->route('cliente.mis-viajes')->with('error', 'No puedes valorar servicios cancelados.');
+        }
+
         // Asegurar que no se haya valorado ya
         if ($reserva->valoracion) {
-            return redirect()->route('cliente.mis-viajes')->with('message', 'Ya has valorado esta reserva.');
+            return redirect()->route('cliente.mis-viajes')->with('error', 'Ya has valorado esta reserva.');
         }
 
         // Cargar la relación del taxista y su usuario
@@ -55,7 +60,7 @@ public function store(Request $request)
         }
 
         if ($reserva->valoracion) {
-            return redirect()->route('cliente.mis-viajes')->with('message', 'Ya has valorado esta reserva.');
+            return redirect()->route('cliente.mis-viajes')->with('error', 'Ya has valorado esta reserva.');
         }
 
         $reserva->valoracion()->create([
@@ -65,7 +70,7 @@ public function store(Request $request)
             'comentario' => $data['comentario'],
         ]);
 
-        return redirect()->route('cliente.mis-viajes')->with('message', 'Valoración creada con éxito.');
+        return redirect()->route('cliente.mis-viajes')->with('success', 'Valoración creada con éxito.');
     }
 
 }
