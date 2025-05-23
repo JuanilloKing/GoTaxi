@@ -6,6 +6,7 @@ use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultaTarifaController;
+use App\Http\Controllers\PagoReservaController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\LocationController;
@@ -76,10 +77,11 @@ Route::get('/contactos', function () {
 Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado'])
     ->name('taxista.cambiar-estado');
 
+    // Rutas APIS 
 Route::get('/api/provincias', [LocationController::class, 'getProvincias']);
 Route::get('/api/municipios/{provinciaId}', [LocationController::class, 'getMunicipios']);
 
-
+    // Rutas de admin
 Route::get('/admin/tarifas', [TarifaController::class, 'index'])
     ->name('tarifas.index')
     ->middleware(AdminMiddleware::class);
@@ -88,6 +90,7 @@ Route::put('/admin/tarifas/{id}', [TarifaController::class, 'update'])
     ->middleware(AdminMiddleware::class)
     ->name('tarifas.update');
 
+    
 Route::get('/consultar-tarifa', [ConsultaTarifaController::class, 'index'])
     ->name('tarifas.consultar');
 
@@ -98,6 +101,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
+
+
+    // Ruta de pagos
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reserva/{reserva}/pagar', [PagoReservaController::class, 'checkout'])->name('pago.reserva');
+    Route::get('/reserva/{reserva}/pago-exitoso', [PagoReservaController::class, 'success'])->name('pago.success');
+    Route::get('/reserva/{reserva}/pago-cancelado', [PagoReservaController::class, 'cancel'])->name('pago.cancel');
+});
 
 // routes/web.php
 

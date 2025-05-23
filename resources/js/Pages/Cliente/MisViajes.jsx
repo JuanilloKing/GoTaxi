@@ -37,12 +37,29 @@ export default function MisViajes({ auth, reservas }) {
               <p><strong>Tiempo aproximado del viaje:</strong> {reservaActiva.duracion} min</p>
               <p><strong>Estado de la reserva:</strong> {reservaActiva.estado_reservas.estado}</p>
             </div>
+            {!reservaActiva.pagado ? (
+              <>
+                <a
+                  href={route('pago.reserva', reservaActiva.id)}
+                  className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition mr-4"
+                >
+                  Realizar pago
+                </a>
+              </>
+            ) : (
+              <p className="text-green-600 font-semibold mt-4">
+                ✅ Servicio abonado correctamente
+              </p>
+            )}
             <button
               className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
               onClick={() => cancelarReserva(reservaActiva.id)}
             >
               Cancelar Reserva
             </button>
+              <p className="text-sm text-red-500 mt-2 italic">
+                  *Atención: realizar el abono no siempre garantiza realizar el pago completo, ya que es un precio estimado.
+              </p>
           </div>
         ) : (
           <p className="text-center text-gray-500 italic">No tienes ninguna reserva activa.</p>
