@@ -6,6 +6,7 @@ use App\Models\Reserva;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class PagoReservaController extends Controller
 {
@@ -55,4 +56,16 @@ class PagoReservaController extends Controller
     {
         return redirect()->route('cliente.mis-viajes')->with('error', 'El pago fue cancelado.');
     }
+
+    public function mostrarReembolso(Reserva $reserva)
+    {
+        if (!$reserva->pagado) {
+            return redirect()->route('cliente.mis-viajes')->with('error', 'Esta reserva no ha sido abonada.');
+        }
+
+        return Inertia::render('Cliente/Devolucion', [
+            'reserva' => $reserva
+        ]);
+    }
+
 }

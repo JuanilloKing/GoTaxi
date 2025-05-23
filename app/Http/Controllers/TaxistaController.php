@@ -195,7 +195,7 @@ public function store(Request $request)
         if (isset($validated['dni'])) $user->dni = $validated['dni'];
         if (isset($validated['telefono'])) $user->telefono = $validated['telefono'];
         if (!empty($validated['password'])) $user->password = Hash::make($validated['password']);
-    
+
         $user->save();
 
         // Actualizar campos del modelo relacionado (taxista)

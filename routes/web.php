@@ -110,6 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reserva/{reserva}/pago-cancelado', [PagoReservaController::class, 'cancel'])->name('pago.cancel');
 });
 
+Route::get('/pago/{reserva}/reembolso', [PagoReservaController::class, 'mostrarReembolso'])->name('pago.reembolso');
+
 // routes/web.php
 
 require __DIR__.'/auth.php';
