@@ -131,32 +131,39 @@ const Create = () => {
         <div className="w-full md:w-1/2 p-4">
           <h1 className="text-xl font-bold mb-4">Elige tu destino</h1>
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <Autocomplete>
-                <input
-                  type="text"
-                  placeholder="Origen..."
-                  ref={originRef}
-                  className="border p-2 rounded w-full md:w-64"
-                />
-              </Autocomplete>
-              <Autocomplete>
-                <input
-                  type="text"
-                  placeholder="Destino..."
-                  ref={destinationRef}
-                  className="border p-2 rounded w-full md:w-64"
-                />
-              </Autocomplete>
-              <div className="flex gap-2">
-                <button className="bg-blue-500 text-white p-2 rounded w-full md:w-auto" onClick={calculateRoute}>
-                  Mostrar Ruta
-                </button>
-                <button className="bg-gray-400 text-white p-2 rounded w-full md:w-auto" onClick={clearRoute}>
-                  Limpiar
-                </button>
-              </div>
-            </div>
+<div className="flex flex-col lg:flex-row flex-wrap gap-4">
+  <Autocomplete className="w-full lg:w-[250px]">
+    <input
+      type="text"
+      placeholder="Origen..."
+      ref={originRef}
+      className="border p-2 rounded w-full"
+    />
+  </Autocomplete>
+  <Autocomplete className="w-full lg:w-[250px]">
+    <input
+      type="text"
+      placeholder="Destino..."
+      ref={destinationRef}
+      className="border p-2 rounded w-full"
+    />
+  </Autocomplete>
+  <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+    <button
+      className="bg-blue-500 text-white p-2 rounded w-full sm:w-auto"
+      onClick={calculateRoute}
+    >
+      Mostrar Ruta
+    </button>
+    <button
+      className="bg-gray-400 text-white p-2 rounded w-full sm:w-auto"
+      onClick={clearRoute}
+    >
+      Limpiar
+    </button>
+  </div>
+</div>
+
 
             <div className="relative w-full h-72 md:h-[500px]">
               <GoogleMap
@@ -227,12 +234,6 @@ const Create = () => {
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                 >
                   Reservar taxi ahora
-                </button>
-                <button
-                  type="button"
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full sm:w-auto"
-                >
-                  Programar fecha y hora
                 </button>
               </div>
             )}
