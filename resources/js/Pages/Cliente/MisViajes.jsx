@@ -36,6 +36,7 @@ export default function MisViajes({ auth, reservas }) {
               <p><strong>Fecha y hora recogida:</strong> {new Date(reservaActiva.fecha_recogida).toLocaleString('es-ES')}</p>
               <p><strong>Tiempo aproximado del viaje:</strong> {reservaActiva.duracion} min</p>
               <p><strong>Estado de la reserva:</strong> {reservaActiva.estado_reservas.estado}</p>
+              <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
             </div>
             {!reservaActiva.pagado ? (
               <>
