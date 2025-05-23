@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('anotaciones')->nullable();
             $table->float('distancia');
             $table->decimal('precio', 6, 2);
+            $table->boolean('pagado')->default(false);
             $table->integer('duracion');
             $table->boolean('minusvalido');
             $table->timestamps();

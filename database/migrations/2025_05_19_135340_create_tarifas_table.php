@@ -14,8 +14,8 @@ return new class extends Migration
     Schema::create('tarifas', function (Blueprint $table) {
         $table->id();
         $table->foreignId('provincia_id')->constrained();
-        $table->decimal('precio_km', 8, 2)->default(0);
-        $table->decimal('precio_hora', 8, 2)->default(0);
+        $table->decimal('precio_km', 8, 2)->default(1.50);
+        $table->decimal('precio_hora', 8, 2)->default(0.20);
         $table->timestamps();
     });     
     }

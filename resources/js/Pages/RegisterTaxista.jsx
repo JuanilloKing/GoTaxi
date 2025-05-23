@@ -93,6 +93,7 @@ const RegisterTaxista = () => {
                 </select>
               </div>
 
+              <TextField label="Contraseña" name="password" value={data.password} error={errors.password} onChange={handleChange} type="password" />
               {/* Select Municipio */}
               <div>
                 <InputLabel htmlFor="municipio_id" value="Municipio" />
@@ -115,7 +116,6 @@ const RegisterTaxista = () => {
                 <InputError message={errors.ciudad} className="mt-2" />
               </div>
 
-              <TextField label="Contraseña" name="password" value={data.password} error={errors.password} onChange={handleChange} type="password" />
               <TextField label="Confirmar Contraseña" name="password_confirmation" value={data.password_confirmation} error={errors.password_confirmation} onChange={handleChange} type="password" />
 
               <h2 className="text-lg font-semibold col-span-2 mt-4">Datos del Vehículo</h2>

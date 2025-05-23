@@ -89,7 +89,7 @@ public function store(Request $request)
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->to('/');
+        return redirect()->to('/')->with('success', 'Taxista registrado correctamente.');
     } catch (\Illuminate\Validation\ValidationException $e) {
         DB::rollBack();
         return redirect()->back()->withErrors($e->validator)->withInput();
