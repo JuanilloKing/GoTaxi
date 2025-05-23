@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReservarController;
+use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
@@ -44,11 +44,11 @@ Route::get('/registrar-taxista', [TaxistaController::class, 'create'])->name('re
 Route::post('/registrar-taxista', [TaxistaController::class, 'store'])->name('registrar-taxista.store');
 Route::get('/taxistas/{taxista}', [TaxistaController::class, 'show'])->name('taxistas.show');
 
-Route::post('/reservar', [ReservarController::class, 'store'])->middleware('auth')->name('reservar.store');
+Route::post('/reservar', [ReservaController::class, 'store'])->middleware('auth')->name('reservar.store');
 
-Route::post('/reservas/{reserva}/finalizar', [ReservarController::class, 'finalizar'])->name('reservas.finalizar');
+Route::post('/reservas/{reserva}/finalizar', [ReservaController::class, 'finalizar'])->name('reservas.finalizar');
 
-Route::post('/reservas/{reserva}/cancelado', [ReservarController::class, 'cancelado'])->name('reservas.cancelado');
+Route::post('/reservas/{reserva}/cancelado', [ReservaController::class, 'cancelado'])->name('reservas.cancelado');
 
 Route::get('/taxista/editar', [TaxistaController::class, 'edit'])->name('taxista.edit');
 

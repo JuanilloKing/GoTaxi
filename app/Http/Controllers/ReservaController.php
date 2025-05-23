@@ -10,11 +10,14 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class ReservarController extends Controller
+class ReservaController extends Controller
 {
     public function store(Request $request)
     {
-        $user = User::findOrFail(Auth::user()->id);
+        $tipable = Auth::user()->tipable;
+        if (!$tipable instanceof \App\Models\Cliente) {
+            return redirect()->back()->with('error', 'Registrate como cliente para poder hacer reservas.');
+        }
         $request->merge([
             'distancia' => (float) $request->input('distancia'),
             'duracion' => (int) $request->input('duracion'),
@@ -22,7 +25,7 @@ class ReservarController extends Controller
             'minusvalido' => filter_var($request->input('minusvalido'), FILTER_VALIDATE_BOOLEAN),
             'pasajeros' => (int) $request->input('pasajeros'),
         ]);
-        
+
         $request->validate([
             'origen' => 'required|string|max:255',
             'destino' => 'required|string|max:255',
@@ -58,18 +61,20 @@ class ReservarController extends Controller
             ->orderByRaw("COALESCE(ultimo_viaje, '1970-01-01 00:00:00') ASC")
             ->orderBy('created_at', 'ASC')
             ->first();
-
+            if ($request->precio  <= 2) {
+                return redirect()->back()->with('error', 'El precio mínimo para un viaje es de 2 euros.');
+            }
+            
             if ($taxista == null) {
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
             }
-
 
         $confirmada = 2;
         try {
             DB::beginTransaction();
         
             $reserva = Reserva::create([
-                'cliente_id' => $user->id,
+                'cliente_id' => $tipable->id,
                 'taxista_id' => $taxista->id,
                 'fecha_reserva' => date('Y-m-d H:i:s', strtotime($fecha_recogida)),
                 'fecha_recogida' => $fecha_recogida,
