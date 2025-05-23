@@ -6,6 +6,7 @@ use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultaTarifaController;
+use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TarifaController;
@@ -95,6 +96,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/valoraciones/crear/{reserva}', [ValoracionController::class, 'create'])->name('valoraciones.create');
     Route::post('/valoraciones', [ValoracionController::class, 'store'])->name('valoraciones.store');
 });
+
+Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
 
 // routes/web.php
 

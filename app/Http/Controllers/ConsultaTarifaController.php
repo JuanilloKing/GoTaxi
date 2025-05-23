@@ -23,7 +23,7 @@ public function index(Request $request)
         );
 
     if (!empty($search)) {
-        $query->where('provincias.provincia', 'like', $search . '%');
+        $query->where('provincias.provincia', 'ILIKE', $search . '%');
     }
 
     $query->orderBy('provincias.provincia', $sort);
