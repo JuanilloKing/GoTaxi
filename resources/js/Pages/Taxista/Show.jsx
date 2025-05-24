@@ -1,19 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import FlashMessage from '@/Components/FlashMensaje';
+import { Head, useForm, Link, usePage } from '@inertiajs/react';
 
-export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas }) {
+export default function Show({ auth, taxista, reservaActiva: initialReservaActiva, reservasFinalizadas }) {
   const user = auth.user;
   const { post } = useForm();
+  const { flash } = usePage().props;
+  const [reservaActiva, setReservaActiva] = useState(initialReservaActiva);
 
   const finalizarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
-      post(route('reservas.finalizar', id));
+      post(route('reservas.finalizar', id), {
+        onSuccess: () => {
+          setReservaActiva({ ...reservaActiva, estado_reservas_id: 5, fecha_entrega: new Date().toISOString() }); // simulación, podrías eliminarla de la vista también
+        }
+      });
+    }
+  };
+
+  const comenzarReserva = (id) => {
+    if (confirm('¿Estás seguro de que quieres comenzar este servicio?')) {
+      post(route('reservas.comenzar', id), {
+        onSuccess: () => {
+          setReservaActiva({ ...reservaActiva, estado_reservas_id: 4 });
+        }
+      });
     }
   };
 
   return (
     <GuestLayout user={user}>
+      <FlashMessage message={flash.success} type="success" />
+      <FlashMessage message={flash.error} type="error" />
       <Head title="Servicios del taxista" />
 
       <div className="max-w-4xl mx-auto py-6 px-4">
@@ -36,12 +55,24 @@ export default function Show({ auth, taxista, reservaActiva, reservasFinalizadas
                   <span className="text-gray-400 italic">No hay anotaciones</span>
                 )}
               </p>
-              <button
-                onClick={() => finalizarReserva(reservaActiva.id)}
-                className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-              >
-                Marcar como entregado
-              </button>
+
+              {reservaActiva.estado_reservas_id === 2 && (
+                <button
+                  onClick={() => comenzarReserva(reservaActiva.id)}
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                >
+                  Comenzar servicio
+                </button>
+              )}
+
+              {reservaActiva.estado_reservas_id === 4 && (
+                <button
+                  onClick={() => finalizarReserva(reservaActiva.id)}
+                  className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                >
+                  Marcar como entregado
+                </button>
+              )}
             </div>
           ) : (
             <p className="text-gray-500">No hay ningún servicio activo actualmente.</p>

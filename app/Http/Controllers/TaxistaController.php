@@ -205,7 +205,7 @@ public function store(Request $request)
         }
 
         return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente.');
-            }
+    }
 
 
         public function cambiarEstado()

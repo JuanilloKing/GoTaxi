@@ -5,8 +5,8 @@ import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
 
 export default function MisViajes({ auth, reservas }) {
-  const reservaActiva = reservas.data.find(r => r.estado_reservas_id === 2);
-  const reservasAnteriores = reservas.data.filter(r => r.estado_reservas_id !== 2);
+  const reservaActiva = reservas.data.find(r => [2, 4].includes(r.estado_reservas_id));
+  const reservasAnteriores = reservas.data.filter(r => ![2, 4].includes(r.estado_reservas_id));
   const { flash } = usePage().props;
 
 

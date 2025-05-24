@@ -50,21 +50,49 @@ class ReservaController extends Controller
         $ciudadOrigen = $data['features'][0]['properties']['city'] ?? 'Desconocido';
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
-        $taxista = Taxista::where('estado_taxistas_id', 1)
-            ->whereHas('municipio', function ($query) use ($ciudadOrigen) {
-                $query->where('municipio', $ciudadOrigen); // o 'nombre', según tu campo
-            })
-            ->whereHas('vehiculo', function ($query) use ($request) {
-                $query->where('disponible', true)
-                    ->where('capacidad', '>=', $request->pasajeros);
-            })
-            ->orderByRaw("COALESCE(ultimo_viaje, '1970-01-01 00:00:00') ASC")
-            ->orderBy('created_at', 'ASC')
-            ->first();
-            if ($request->precio  <= 2) {
-                return redirect()->back()->with('error', 'El precio mínimo para un viaje es de 2 euros.');
+
+        $taxistasEnCiudad = Taxista::whereHas('municipio', function ($query) use ($ciudadOrigen) {
+            $query->where('municipio', $ciudadOrigen);
+        })->get();
+
+        if ($taxistasEnCiudad->isEmpty()) {
+            return redirect()->back()->with('error', 'La ciudad seleccionada aún no está operativa con nosotros.');
+        }
+
+        // 2. Filtrar por vehículos disponibles con capacidad suficiente
+        $taxistasDisponibles = $taxistasEnCiudad->filter(function ($taxista) use ($request) {
+            return $taxista->vehiculo &&
+                $taxista->vehiculo->disponible &&
+                $taxista->vehiculo->capacidad >= $request->pasajeros;
+        });
+
+        if ($taxistasDisponibles->isEmpty()) {
+            return redirect()->back()->with('error', 'No hay taxis disponibles para esa capacidad en este momento.');
+        }
+
+        // 3. Filtrar por accesibilidad si es necesario
+        if ($request->minusvalido) {
+            $taxistasDisponibles = $taxistasDisponibles->filter(fn($t) => $t->minusvalido);
+
+            if ($taxistasDisponibles->isEmpty()) {
+                return redirect()->back()->with('error', 'No hay taxistas disponibles para personas con movilidad reducida en estos momentos.');
             }
-            
+        }
+
+        // 4. Verificar precio mínimo
+        if ($request->precio <= 2) {
+            return redirect()->back()->with('error', 'El precio mínimo para un viaje es de 2 euros.');
+        }
+
+        // 5. Seleccionar el mejor taxista según prioridad
+        $taxista = $taxistasDisponibles
+            ->sortBy([
+                fn($a) => $a->ultimo_viaje ?? '1970-01-01 00:00:00',
+                fn($a) => $a->created_at
+            ])
+            ->first();
+
+
             if ($taxista == null) {
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
             }
@@ -134,4 +162,14 @@ class ReservaController extends Controller
 
         return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
     }
+
+    public function comenzar(Reserva $reserva)
+    {
+        $reserva->estado_reservas_id = 4;
+        $reserva->fecha_recogida = now();
+        $reserva->save();
+
+        return back()->with('success', 'Reserva comenzada correctamente.');
+}
+
 }

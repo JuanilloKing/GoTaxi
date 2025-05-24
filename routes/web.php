@@ -47,9 +47,14 @@ Route::get('/taxistas/{taxista}', [TaxistaController::class, 'show'])->name('tax
 
 Route::post('/reservar', [ReservaController::class, 'store'])->middleware('auth')->name('reservar.store');
 
+
+    // Rutas de estado reservas
 Route::post('/reservas/{reserva}/finalizar', [ReservaController::class, 'finalizar'])->name('reservas.finalizar');
 
 Route::post('/reservas/{reserva}/cancelado', [ReservaController::class, 'cancelado'])->name('reservas.cancelado');
+
+Route::post('/reservas/{reserva}/comenzar', [ReservaController::class, 'comenzar'])->name('reservas.comenzar');
+
 
 Route::get('/taxista/editar', [TaxistaController::class, 'edit'])->name('taxista.edit');
 
