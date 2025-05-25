@@ -62,7 +62,7 @@ class RegisteredUserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error al registrar el usuario: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Error al registrar el usuario.']);
+            return redirect()->back()->withErrors(['error' => 'Error al registrar el usuario. [' . now()->timestamp . ']']);
         }
         DB::commit();
 

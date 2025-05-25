@@ -15,7 +15,7 @@ class ContactoController extends Controller
         ]);
         
         if (strlen($request->mensaje) < 10) {
-            return redirect()->back()->with('error', 'El mensaje debe tener al menos 10 caracteres.');
+            return redirect()->back()->with('error', 'El mensaje debe tener al menos 10 caracteres. [' . now()->timestamp . ']');
         }
 
         Contacto::create([
@@ -24,6 +24,6 @@ class ContactoController extends Controller
             'mensaje' => $request->mensaje,
         ]);
 
-        return redirect()->back()->with('success', 'Mensaje enviado correctamente.');
+        return redirect()->back()->with('success', 'Mensaje enviado correctamente. [' . now()->timestamp . ']');
     }
 };

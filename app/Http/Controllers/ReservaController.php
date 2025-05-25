@@ -16,7 +16,7 @@ class ReservaController extends Controller
     {
         $tipable = Auth::user()->tipable;
         if (!$tipable instanceof \App\Models\Cliente) {
-            return redirect()->back()->with('error', 'Registrate como cliente para poder hacer reservas.');
+            return redirect()->back()->with('error', 'Registrate como cliente para poder hacer reservas. [' . now()->timestamp . ']');
         }
         $request->merge([
             'distancia' => (float) $request->input('distancia'),
@@ -51,23 +51,26 @@ class ReservaController extends Controller
         $fecha_reserva = now();
         $fecha_recogida = empty($request->fecha_recogida) ? now() : $request->fecha_recogida;
 
+        if ($request->duracion >= 1080) {
+            return redirect()->back()->with('error', 'La duración del viaje no puede ser mayor a 18 horas. [' . now()->timestamp . ']');
+        }
+
         $taxistasEnCiudad = Taxista::whereHas('municipio', function ($query) use ($ciudadOrigen) {
             $query->where('municipio', $ciudadOrigen);
         })->get();
 
         if ($taxistasEnCiudad->isEmpty()) {
-            return redirect()->back()->with('error', 'La ciudad seleccionada aún no está operativa con nosotros.');
+            return redirect()->back()->with('error', 'La ciudad seleccionada aún no está operativa con nosotros. [' . now()->timestamp . ']');
         }
 
         // 2. Filtrar por vehículos disponibles con capacidad suficiente
         $taxistasDisponibles = $taxistasEnCiudad->filter(function ($taxista) use ($request) {
             return $taxista->vehiculo &&
-                $taxista->vehiculo->disponible &&
                 $taxista->vehiculo->capacidad >= $request->pasajeros;
         });
 
         if ($taxistasDisponibles->isEmpty()) {
-            return redirect()->back()->with('error', 'No hay taxis disponibles para esa capacidad en este momento.');
+            return redirect()->back()->with('error', 'No hay taxis disponibles para esa capacidad en este momento. [' . now()->timestamp . ']');
         }
 
         // 3. Filtrar por accesibilidad si es necesario
@@ -75,13 +78,13 @@ class ReservaController extends Controller
             $taxistasDisponibles = $taxistasDisponibles->filter(fn($t) => $t->minusvalido);
 
             if ($taxistasDisponibles->isEmpty()) {
-                return redirect()->back()->with('error', 'No hay taxistas disponibles para personas con movilidad reducida en estos momentos.');
+                return redirect()->back()->with('error', 'No hay taxistas disponibles para personas con movilidad reducida en estos momentos. [' . now()->timestamp . ']');
             }
         }
 
         // 4. Verificar precio mínimo
         if ($request->precio <= 2) {
-            return redirect()->back()->with('error', 'El precio mínimo para un viaje es de 2 euros.');
+            return redirect()->back()->with('error', 'El precio mínimo para un viaje es de 2 euros. [' . now()->timestamp . '] ');
         }
 
         // 5. Seleccionar el mejor taxista según prioridad
@@ -94,7 +97,7 @@ class ReservaController extends Controller
 
 
             if ($taxista == null) {
-                return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde.');
+                return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde. [' . now()->timestamp . '] ');
             }
 
         $confirmada = 2;
@@ -145,7 +148,7 @@ class ReservaController extends Controller
         $taxista->save();
         $reserva->save();
 
-        return redirect()->back()->with('success', 'Servicio finalizado correctamente.');
+        return redirect()->back()->with('success', 'Servicio finalizado correctamente. [' . now()->timestamp . ']');
     }
 
     public function cancelado(Reserva $reserva)
@@ -160,7 +163,7 @@ class ReservaController extends Controller
         $taxista->save();
         $reserva->save();
 
-        return redirect()->back()->with('success', 'Reserva cancelada correctamente.');
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
     }
 
     public function comenzar(Reserva $reserva)
@@ -169,7 +172,7 @@ class ReservaController extends Controller
         $reserva->fecha_recogida = now();
         $reserva->save();
 
-        return back()->with('success', 'Reserva comenzada correctamente.');
+        return back()->with('success', 'Reserva comenzada correctamente. [' . now()->timestamp . ']');
 }
 
 }
