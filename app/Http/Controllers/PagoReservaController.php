@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Reserva;
 use Stripe\Stripe;
+use Stripe\Refund;
 use Stripe\Checkout\Session as StripeSession;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -58,14 +59,37 @@ class PagoReservaController extends Controller
     }
 
     public function mostrarReembolso(Reserva $reserva)
+{
+    if (!$reserva->pagado) {
+        return redirect()->route('cliente.mis-viajes')->with('error', 'Esta reserva no ha sido abonada.');
+    }
+
+    return Inertia::render('Cliente/Devolucion', [
+        'reserva' => $reserva
+    ]);
+}
+
+    public function procesarReembolso(Reserva $reserva)
     {
-        if (!$reserva->pagado) {
-            return redirect()->route('cliente.mis-viajes')->with('error', 'Esta reserva no ha sido abonada.');
+        if (!$reserva->pagado || !$reserva->stripe_payment_intent_id) {
+            return redirect()->back()->with('error', 'No se puede procesar el reembolso.');
         }
 
-        return Inertia::render('Cliente/Devolucion', [
-            'reserva' => $reserva
-        ]);
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        try {
+            Refund::create([
+                'payment_intent' => $reserva->stripe_payment_intent_id,
+                // 'amount' => 1000, // opcional, si querés reembolsar parcial
+            ]);
+
+            $reserva->pagado = false;
+            $reserva->save();
+
+            return redirect()->route('cliente.mis-viajes')->with('success', 'Reembolso procesado correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al procesar el reembolso: ' . $e->getMessage());
+        }
     }
 
 }

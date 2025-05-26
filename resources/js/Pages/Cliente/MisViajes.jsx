@@ -49,18 +49,36 @@ const cancelarReserva = (id) => {
               <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
             </div>
             {!reservaActiva.pagado ? (
-              <>
-                <a
-                  href={route('pago.reserva', reservaActiva.id)}
-                  className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition mr-4"
-                >
-                  Realizar pago
-                </a>
-              </>
+              <a
+                href={route('pago.reserva', reservaActiva.id)}
+                className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition mr-4"
+              >
+                Realizar pago
+              </a>
             ) : (
-              <p className="text-green-600 font-semibold mt-4">
-                ✅ Servicio abonado correctamente
-              </p>
+              <div className="mt-4 space-y-2">
+                <p className="text-green-600 font-semibold">
+                  ✅ Servicio abonado correctamente
+                </p>
+                {reservaActiva.estado_reservas_id === 2 && (
+                  <div className="space-y-2">
+                  <a
+                    href={route('pago.reembolso', reservaActiva.id)}
+                    className="inline-block px-6 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
+                  >
+                    Cancelar pago
+                  </a>
+                  <p className="text-yellow-600 italic">
+                    ⚠️ Si cancelas el pago, se te redirigirá al proceso de devolución.
+                  </p>
+                  </div>
+                )}
+                {reservaActiva.estado_reservas_id === 4 && (
+                  <p className="text-red-600 italic">
+                    ❌ No puedes cancelar el pago de un servicio que está siendo realizado
+                  </p>
+                )}
+              </div>
             )}
             <button
               className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -88,11 +106,13 @@ const cancelarReserva = (id) => {
                   <li key={i} className="p-6 bg-white rounded-xl shadow border border-gray-100">
                     <div className="grid md:grid-cols-2 gap-4">
                       <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString('es-ES')}</p>
-                      <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString('es-ES')}</p>
+                      {reserva.estado_reservas_id !== 3 && (
+                        <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString('es-ES')}</p>
+                      )}
                       <p><strong>Origen:</strong> {reserva.origen}</p>
                       <p><strong>Destino:</strong> {reserva.destino}</p>
                       <p><strong>Pasajeros:</strong> {reserva.num_pasajeros}</p>
-                      <p><strong>Estado:</strong> <span className="capitalize">{reserva.estado_reservas.estado}</span></p>
+                      <p><strong>Estado:</strong> <span className="capitalize">{reserva.estado_reservas.estado  }</span></p>
                       {/* Valoración */}
                       <div className="col-span-2 mt-2">
                         {reserva.estado_reservas_id === 3 ? (
