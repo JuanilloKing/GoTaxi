@@ -20,6 +20,15 @@ class ReservaController extends Controller
         if (!$tipable instanceof \App\Models\Cliente) {
             return redirect()->back()->with('error', 'Registrate como cliente para poder hacer reservas. [' . now()->timestamp . ']');
         }
+        $cliente = $tipable;
+        $tieneReservaActiva = Reserva::where('cliente_id', $cliente->id)
+            ->whereIn('estado_reservas_id', [2, 4])
+            ->exists();
+
+        if ($tieneReservaActiva) {
+            return redirect()->back()->with('error', 'Ya tienes una reserva activa. Debes cancelarla antes de poder hacer otra. [' . now()->timestamp . ']');
+        }
+
         $request->merge([
             'distancia' => (float) $request->input('distancia'),
             'duracion' => (int) $request->input('duracion'),
@@ -132,6 +141,7 @@ class ReservaController extends Controller
             dd('Error al guardar reserva:', $e->getMessage());
         }
         Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
+
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
