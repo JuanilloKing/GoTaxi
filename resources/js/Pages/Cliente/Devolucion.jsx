@@ -16,7 +16,7 @@ export default function Devolucion({ reserva }) {
           </p>
           <button
             className="px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-            onClick={() => router.post(route('reservas.cancelado', reserva.id))}
+            onClick={() => router.post(route('pago.reembolso', reserva.id))}
           >
             Confirmar Cancelación y Solicitar Reembolso
           </button>

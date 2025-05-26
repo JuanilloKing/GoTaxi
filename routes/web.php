@@ -114,9 +114,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reserva/{reserva}/pago-exitoso', [PagoReservaController::class, 'success'])->name('pago.success');
     Route::get('/reserva/{reserva}/pago-cancelado', [PagoReservaController::class, 'cancel'])->name('pago.cancel');
     Route::post('/reserva/{reserva}/reembolso', [PagoReservaController::class, 'procesarReembolso'])->name('pago.reembolso');
+    Route::get('/pago/{reserva}/reembolso', [PagoReservaController::class, 'mostrarReembolso'])->name('pago.reembolso.mostrar');
 });
 
-Route::get('/pago/{reserva}/reembolso', [PagoReservaController::class, 'mostrarReembolso'])->name('pago.reembolso');
 
 // routes/web.php
 

@@ -63,7 +63,7 @@ const cancelarReserva = (id) => {
                 {reservaActiva.estado_reservas_id === 2 && (
                   <div className="space-y-2">
                   <a
-                    href={route('pago.reembolso', reservaActiva.id)}
+                    href={route('pago.reembolso.mostrar', reservaActiva.id)}
                     className="inline-block px-6 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition"
                   >
                     Cancelar pago
