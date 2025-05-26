@@ -7,8 +7,10 @@ use App\Models\Reserva;
 use App\Models\Taxista;
 use App\Models\User;
 use GuzzleHttp\Client;
+use App\Mail\ReservaCreada;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ReservaController extends Controller
 {
@@ -129,7 +131,7 @@ class ReservaController extends Controller
             DB::rollBack();
             dd('Error al guardar reserva:', $e->getMessage());
         }
-
+        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
