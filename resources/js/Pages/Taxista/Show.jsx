@@ -48,6 +48,7 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
               <p><strong>Destino:</strong> {reservaActiva.destino}</p>
               <p><strong>Nombre cliente:</strong> {reservaActiva.cliente.user.nombre}</p>
               <p><strong>Teléfono:</strong> {reservaActiva.cliente.user.telefono}</p>
+              <p><strong>Pagado:</strong> {reservaActiva.pagado ? '✔️ Sí' : '❌ No'}</p>
               <p><strong>Anotaciones:</strong>{' '}
                 {reservaActiva.anotaciones?.trim() ? (
                   reservaActiva.anotaciones
