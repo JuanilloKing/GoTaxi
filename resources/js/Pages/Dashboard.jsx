@@ -1,26 +1,43 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import Header from '@/Components/Header';
+import Footer from '@/Components/Footer';
+import { useEffect, useState } from 'react';
 
-export default function Dashboard() {
+export default function Dashboard({ error = true }) {
+    const [seconds, setSeconds] = useState(3);
+
+    useEffect(() => {
+        if (error) {
+            const countdown = setInterval(() => {
+                setSeconds((prev) => prev - 1);
+            }, 1000);
+
+            const timeout = setTimeout(() => {
+                router.visit('/');
+            }, 3000);
+
+            return () => {
+                clearInterval(countdown);
+                clearTimeout(timeout);
+            };
+        }
+    }, [error]);
+
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
-            <Head title="Dashboard" />
-
+        <div>
+            <Header />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                            You're logged in!
+                            <div className="text-center">
+                                <p>Ya has iniciado sesión, volviendo al menú inicial en {seconds}...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+            <Footer />
+        </div>
     );
 }

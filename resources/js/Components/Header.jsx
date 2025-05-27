@@ -96,7 +96,7 @@ export default function Header() {
 
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white border rounded shadow-lg">
-                <ul className="p-2">
+                <ul className="p-2" style={{ width: '150px' }}>
                   <li>
                   {isTaxista ? (
                   <div className="block px-4 py-2 text-gray-800 flex items-center gap-2 cursor-default">
