@@ -62,53 +62,76 @@ const Create = () => {
     if (originRef.current.value === destinationRef.current.value) {
       alert('El origen y el destino son iguales.');
       return;
-      
     }
 
     const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
 
-    setDirections(results);
-    setOrigin(originRef.current.value);
-    setDestination(destinationRef.current.value);
-
-    const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
-    const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
-    setDistancia(km);
-    setDuracion(min);
-
-    const originLatLng = results.routes[0].legs[0].start_location;
-    setData('lat_origen', originLatLng.lat());
-    setData('lon_origen', originLatLng.lng());
-
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ location: originLatLng }, async (geocodeResults, status) => {
-      if (status === "OK" && geocodeResults[0]) {
-        const components = geocodeResults[0].address_components;
-        const provinciaOrigen = components.find(c => c.types.includes("administrative_area_level_2"))?.long_name;
-
-        if (provinciaOrigen) {
-          try {
-            const response = await fetch(`/api/tarifas/${encodeURIComponent(provinciaOrigen)}`);
-            const data = await response.json();
-
-            if (data.precio_km && data.precio_hora) {
-              setTarifa({ precio_km: data.precio_km, precio_hora: data.precio_hora });
-
-              const precioCalculado = (km * data.precio_km + min * (data.precio_hora / 60)).toFixed(2);
-              setData('precio', precioCalculado);
+    try {
+      const results = await new Promise((resolve, reject) => {
+        directionsService.route(
+          {
+            origin: originRef.current.value,
+            destination: destinationRef.current.value,
+            travelMode: google.maps.TravelMode.DRIVING,
+          },
+          (result, status) => {
+            if (status === 'OK') {
+              resolve(result);
+            } else {
+              reject(status); // Captura errores como ZERO_RESULTS
             }
-          } catch (error) {
-            console.error("Error al obtener tarifa:", error);
+          }
+        );
+      });
+
+      setDirections(results);
+      setOrigin(originRef.current.value);
+      setDestination(destinationRef.current.value);
+
+      const km = (results.routes[0].legs[0].distance.value / 1000).toFixed(2);
+      const min = Math.ceil(results.routes[0].legs[0].duration.value / 60);
+      setDistancia(km);
+      setDuracion(min);
+
+      const originLatLng = results.routes[0].legs[0].start_location;
+      setData('lat_origen', originLatLng.lat());
+      setData('lon_origen', originLatLng.lng());
+
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: originLatLng }, async (geocodeResults, status) => {
+        if (status === "OK" && geocodeResults[0]) {
+          const components = geocodeResults[0].address_components;
+          const provinciaOrigen = components.find(c => c.types.includes("administrative_area_level_2"))?.long_name;
+
+          if (provinciaOrigen) {
+            try {
+              const response = await fetch(`/api/tarifas/${encodeURIComponent(provinciaOrigen)}`);
+              const data = await response.json();
+
+              if (data.precio_km && data.precio_hora) {
+                setTarifa({ precio_km: data.precio_km, precio_hora: data.precio_hora });
+
+                const precioCalculado = (km * data.precio_km + min * (data.precio_hora / 60)).toFixed(2);
+                setData('precio', precioCalculado);
+              }
+            } catch (error) {
+              console.error("Error al obtener tarifa:", error);
+            }
           }
         }
+      });
+    } catch (errorStatus) {
+      console.error('Error al calcular ruta:', errorStatus);
+
+      // 🔔 Aquí defines qué hacer en cada error
+      if (errorStatus === 'ZERO_RESULTS') {
+        alert('No se pudo encontrar una ruta entre el origen y destino.');
+      } else {
+        alert(`Error al calcular la ruta: ${errorStatus}`);
       }
-    });
+    }
   };
+
 
   const clearRoute = () => {
     setDirections(null);

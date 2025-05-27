@@ -12,7 +12,7 @@ use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TarifaController;
 use App\Http\Middleware\AdminMiddleware;
-
+use App\Models\Contacto;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -116,6 +116,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reserva/{reserva}/reembolso', [PagoReservaController::class, 'procesarReembolso'])->name('pago.reembolso');
     Route::get('/pago/{reserva}/reembolso', [PagoReservaController::class, 'mostrarReembolso'])->name('pago.reembolso.mostrar');
 });
+
+    // Ruta para ver mensajes que dejan los usuarios
+    Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/mensajes', [ContactoController::class, 'index'])->name('mensajes.index');
+});
+
 
 
 // routes/web.php

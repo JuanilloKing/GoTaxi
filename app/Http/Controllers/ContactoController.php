@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 use App\Models\Contacto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ContactoController extends Controller
 {
+
+    public function index()
+    {
+        $contactos = Contacto::latest()->paginate(10);
+
+        return Inertia::render('Admin/Mensajes/Index', [
+            'contactos' => $contactos,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
