@@ -126,20 +126,19 @@ public function store(Request $request)
      */
     public function show(Request $request, Taxista $taxista)
     {
-        // Cargar solo la reserva activa (sin fecha_entrega)
-        $reservaActiva = $taxista->reservas()
-            ->with('cliente.user')
-            ->whereNull('fecha_entrega')
-            ->first();
+    $reservaActiva = $taxista->reservas()
+        ->with('cliente.user')
+        ->whereIn('estado_reservas_id', [2, 4])
+        ->first();
     
-        // Paginación de reservas finalizadas (con fecha_entrega)
-        $reservasFinalizadas = $taxista->reservas()
-            ->with('cliente.user')
-            ->whereNotNull('fecha_entrega')
-            ->orderByDesc('fecha_entrega')
-            ->paginate(5) // Paginamos de 5 en 5
-            ->withQueryString(); // Para mantener filtros si los hubiera
-    
+    $reservasFinalizadas = $taxista->reservas()
+        ->with('cliente.user')
+        ->whereNotIn('estado_reservas_id', [2, 4])
+        ->whereDate('fecha_entrega', '!=', '1970-01-01')
+        ->orderByDesc('fecha_entrega')
+        ->paginate(5)
+        ->withQueryString();
+
         return Inertia::render('Taxista/Show', [
             'taxista' => $taxista,
             'reservaActiva' => $reservaActiva,
@@ -204,10 +203,10 @@ public function store(Request $request)
             $taxista->save();
         }
 
-        return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente.');
+        return redirect()->route('taxista.edit')->with('success', 'Perfil actualizado correctamente. [' . now()->timestamp . '] ');
     }
 
-
+    
         public function cambiarEstado()
         {   
             $user = Auth::user();
@@ -218,7 +217,7 @@ public function store(Request $request)
             $taxista = $user->tipable;
 
             if ($taxista->estado_taxistas_id == 2) {
-                return back()->with('error', 'No puedes cambiar el estado teniendo un servicio activo.');
+                return back()->with('error', 'No puedes cambiar el estado teniendo un servicio activo. [' . now()->timestamp . ']');
             }
             if ($taxista->estado_taxistas_id == 1) {
                 // Cambiar a ocupado
@@ -229,7 +228,11 @@ public function store(Request $request)
                 $taxista->estado_taxistas_id = 1;
             }
             $taxista->save();
-            return back()->with('success', 'Estado de disponibilidad actualizado correctamente.');
+            if ($taxista->estado_taxistas_id == 1) {
+                return back()->with('success', 'Estado actual: Disponible [' . now()->timestamp . '] ');
+            }
+            if ($taxista->estado_taxistas_id == 3) {
+                return back()->with('error', 'Estado actual: No Disponible [' . now()->timestamp . '] ');
+            }
         }
-
 }

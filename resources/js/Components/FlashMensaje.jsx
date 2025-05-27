@@ -19,7 +19,7 @@ export default function FlashMessage({ message, type = 'success' }) {
         type === 'success' ? 'bg-green-500' : 'bg-red-500'
       }`}
     >
-      <span>{message.replace(/\s*\[\d+\]$/, '')}</span>
+      <span>{message.replace(/\s*\[\d+\]\s*$/, '')}</span>
       <button onClick={() => setVisible(false)} className="ml-4 font-bold hover:text-gray-200 text-lg leading-none">
         x
       </button>

@@ -1,5 +1,5 @@
 import Principal from '@/Layouts/Principal'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { useState } from 'react'
 import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
@@ -11,21 +11,22 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 
+
 function Icon({ id, open }) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={2}
-      stroke="currentColor"
-      className={`${id === open ? "rotate-180" : ""} h-5 w-5 transition-transform`}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className={`${id === open ? "rotate-180" : ""} h-5 w-5 transition-transform`}
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
     </svg>
   );
 }
- 
+
 
 export default function Welcome({ auth }) {
   const isLoggedIn = !!auth.user
@@ -39,6 +40,16 @@ export default function Welcome({ auth }) {
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
+  const estadoId = auth.estado_id;
+  const cambiarEstado = () => {
+    // Solo permite cambiar entre estado 1 (disponible) y 3 (no disponible)
+    const nuevoEstado = estadoId === 1 ? 3 : 1;
+  
+    router.post(route('taxista.cambiar-estado'), {
+      estado_id: nuevoEstado
+    });
+  };
+  
   const handleClick = (e) => {
     if (isLoggedIn) {
       e.preventDefault()
@@ -126,12 +137,16 @@ export default function Welcome({ auth }) {
               >
               Ver servicios
               </Link>
-                <Link
-                  href="/taxista/mi-historial"
-                  className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
-                >
-                  Cambiar disponibilidad
-                </Link>
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  cambiarEstado();
+                }}
+                className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100 cursor-pointer"
+              >
+                Cambiar disponibilidad
+              </Link>
               </div>
             </div>
             <div>
