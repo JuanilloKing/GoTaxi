@@ -14,6 +14,7 @@ use App\Http\Controllers\TarifaController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Contacto;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,6 +39,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->get('/reservar', function () {
+     $user = Auth::user();
+
+    if ($user->tipable_type === 'App\\Models\\Taxista') {
+        return redirect('/')->with('error', 'Los taxistas no pueden reservar taxi. Entra con una cuenta como cliente.');
+    }
     return Inertia::render('Reservar/Create');
 });
 

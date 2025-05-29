@@ -37,6 +37,25 @@ return new class extends Migration
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        $clienteId2 = DB::table('clientes')->insertGetId([
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+            DB::table('users')->insert([
+            'nombre' => 'Manuel',
+            'apellidos' => 'Gómez',
+            'email' => 'manuel@example.com',
+            'dni' => '52525252E',
+            'telefono' => '600555555',
+            'password' => Hash::make('password'),
+            'is_admin' => false,
+            'tipable_type' => 'App\Models\Cliente',
+            'tipable_id' => $clienteId2, // El ID del cliente nuevo
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

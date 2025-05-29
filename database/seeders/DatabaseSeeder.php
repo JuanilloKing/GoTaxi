@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Taxista;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\ImportarMunicipiosSeeder;
@@ -20,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ProvinciaSeeder::class,
             ImportarMunicipiosSeeder::class,
             TarifaSeeder::class,
+            TaxistaSeeder::class,
         ]);
     }
 }
