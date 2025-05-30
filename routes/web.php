@@ -6,6 +6,7 @@ use App\Http\Controllers\TaxistaController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultaTarifaController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PagoReservaController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ValoracionController;
@@ -109,6 +110,12 @@ Route::get('/consultar-tarifa', [ConsultaTarifaController::class, 'index'])
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/valoraciones/crear/{reserva}', [ValoracionController::class, 'create'])->name('valoraciones.create');
     Route::post('/valoraciones', [ValoracionController::class, 'store'])->name('valoraciones.store');
+});
+
+Route::middleware(['auth', AdminMiddleware::class])->group(function () {
+    Route::get('/admin/usuarios', [UserController::class, 'index'])->name('admin.users.index');
+    Route::put('/admin/usuarios/{user}/togle-admin', [UserController::class, 'togleAdmin'])->name('admin.users.togle-admin');
+    Route::delete('/admin/usuarios/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
 Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
