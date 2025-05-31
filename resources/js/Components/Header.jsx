@@ -1,6 +1,7 @@
 import { usePage, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import NavLink from './NavLink';
+import { useEffect } from 'react';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -12,6 +13,32 @@ export default function Header() {
   const isLoggedIn = !!user;
 
   const isTaxista = user?.tipable_type === 'App\\Models\\Taxista';
+  useEffect(() => {
+  if (!isTaxista) return;
+
+  const interval = setInterval(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+
+        fetch('/taxistas/ubicacion', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
+          body: JSON.stringify({
+            lat: latitude,
+            lng: longitude,
+          }),
+        });
+      });
+    }
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, [isTaxista]);
+
   const taxistaId = isTaxista ? user.tipable_id : null;
   const avatarUrl = user?.avatar_url || '/default-avatar.png';
 
@@ -139,7 +166,7 @@ export default function Header() {
                       href="/admin/usuarios"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
-                      Editar usuarios
+                      Gestionar users
                     </Link>
                   </li>
                     <li>

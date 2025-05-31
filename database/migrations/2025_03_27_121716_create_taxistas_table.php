@@ -20,9 +20,12 @@ return new class extends Migration
             $table->timestamp('ultimo_viaje')->nullable();
             $table->foreignId('municipio_id')->constrained('municipios');
             $table->foreignId('estado_taxistas_id')->constrained('estado_taxistas')->nullable();
+            $table->decimal('lat', 10, 8)->nullable();
+            $table->decimal('lng', 11, 8)->nullable();
+            $table->timestamp('ultima_actualizacion_ubicacion')->nullable();
             $table->timestamps();
-        });
-    }
+        }); 
+    }   
 
     
     /**

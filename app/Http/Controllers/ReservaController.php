@@ -64,7 +64,7 @@ class ReservaController extends Controller
 
         if ($request->duracion >= 1080) {
             return redirect()->back()->with('error', 'La duración del viaje no puede ser mayor a 18 horas. [' . now()->timestamp . ']');
-        }
+        }   
 
         $taxistasEnCiudad = Taxista::whereHas('municipio', function ($query) use ($ciudadOrigen) {
             $query->where('municipio', $ciudadOrigen);
@@ -84,6 +84,14 @@ class ReservaController extends Controller
             return redirect()->back()->with('error', 'No hay taxis disponibles para esa capacidad en este momento. [' . now()->timestamp . ']');
         }
 
+        $taxistasDisponibles = $taxistasDisponibles->filter(function ($taxista) {
+            return $taxista->estado_taxistas_id === 1;
+        });
+
+        if ($taxistasDisponibles->isEmpty()) {
+            return redirect()->back()->with('error', 'Todos los taxistas de esta ciudad están ocupados en estos momentos. [' . now()->timestamp . ']');
+        }
+        
         // 3. Filtrar por accesibilidad si es necesario
         if ($request->minusvalido) {
             $taxistasDisponibles = $taxistasDisponibles->filter(fn($t) => $t->minusvalido);
@@ -140,8 +148,9 @@ class ReservaController extends Controller
             DB::rollBack();
             dd('Error al guardar reserva:', $e->getMessage());
         }
-        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
 
+        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
+        $taxista->estado_taxistas_id = 3;
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 

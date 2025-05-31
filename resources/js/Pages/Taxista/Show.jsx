@@ -13,7 +13,7 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
       post(route('reservas.finalizar', id), {
         onSuccess: () => {
-          setReservaActiva({ ...reservaActiva, estado_reservas_id: 5, fecha_entrega: new Date().toISOString() }); // simulación, podrías eliminarla de la vista también
+          setReservaActiva(null);
         }
       });
     }

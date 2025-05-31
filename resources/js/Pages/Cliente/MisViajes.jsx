@@ -3,11 +3,15 @@ import Footer from '@/Components/Footer';
 import Header from '@/Components/Header';
 import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
+import { useEffect, useState } from 'react';
+import { useJsApiLoader } from '@react-google-maps/api';
 
 export default function MisViajes({ auth, reservas }) {
   const reservaActiva = reservas.data.find(r => [2, 4].includes(r.estado_reservas_id));
   const reservasAnteriores = reservas.data.filter(r => ![2, 4].includes(r.estado_reservas_id));
   const { flash } = usePage().props;
+  const [tiempoLlegada, setTiempoLlegada] = useState(null);
+  const [minutosDesdeUltimaActualizacion, setMinutosDesdeUltimaActualizacion] = useState(null);
 
 
 const cancelarReserva = (id) => {
@@ -22,9 +26,64 @@ const cancelarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
       router.post(route('reservas.cancelado', id));
     }
+}
 };
 
+const { isLoaded } = useJsApiLoader({
+  googleMapsApiKey: import.meta.env.VITE_GOOGLE_APY_KEY, // asegúrate que la clave sea válida
+  libraries: ['places'],
+});
+
+useEffect(() => {
+  const calcularTiempo = () => {
+    if (
+      !isLoaded ||
+      !reservaActiva?.origen ||
+      !reservaActiva?.taxista?.lat ||
+      !reservaActiva?.taxista?.lng
+    ) {
+      return;
+    }
+
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ address: reservaActiva.origen }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        const origenCoords = results[0].geometry.location;
+
+        const directionsService = new google.maps.DirectionsService();
+        directionsService.route(
+          {
+            origin: new google.maps.LatLng(reservaActiva.taxista.lat, reservaActiva.taxista.lng),
+            destination: origenCoords,
+            travelMode: google.maps.TravelMode.DRIVING,
+          },
+          (result, status) => {
+            if (status === 'OK' && result.routes.length > 0) {
+              const duracion = result.routes[0].legs[0].duration.text;
+              setTiempoLlegada(duracion);
+            } else {
+              console.error('Error al obtener direcciones:', result);
+            }
+          }
+        );
+
+        // Calcular minutos desde última actualización
+        if (reservaActiva.taxista.ultima_actualizacion_ubicacion) {
+          const updatedAt = new Date(reservaActiva.taxista.ultima_actualizacion_ubicacion);
+          const ahora = new Date();
+          const diferenciaMin = Math.floor((ahora - updatedAt) / 60000);
+          setMinutosDesdeUltimaActualizacion(diferenciaMin);
+        }
+      } else {
+        console.error('Error en geocoding:', status, results);
+      }
+    });
   };
+
+  calcularTiempo();
+}, [isLoaded, reservaActiva]);
+
 
   return (
     <div>
@@ -47,6 +106,16 @@ const cancelarReserva = (id) => {
               <p><strong>Tiempo aproximado del viaje:</strong> {reservaActiva.duracion} min</p>
               <p><strong>Estado de la reserva:</strong> {reservaActiva.estado_reservas.estado}</p>
               <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
+              {tiempoLlegada && (
+                <p className="md:col-span-2 text-blue-600 font-semibold">
+                  🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
+                </p>
+              )}
+              {minutosDesdeUltimaActualizacion !== null && (
+                <p className="md:col-span-2 text-sm text-gray-500 italic">
+                  Última actualización: hace {minutosDesdeUltimaActualizacion} min
+                </p>
+              )}
             </div>
             {!reservaActiva.pagado ? (
               <a
@@ -161,4 +230,4 @@ const cancelarReserva = (id) => {
       <Footer />
     </div>
   );
-}
+};

@@ -12,6 +12,7 @@ use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\ValoracionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TarifaController;
+use App\Http\Controllers\TaxistaUbicacionController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Models\Contacto;
 use Illuminate\Foundation\Application;
@@ -134,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['auth', AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/mensajes', [ContactoController::class, 'index'])->name('mensajes.index');
 });
+
+Route::middleware('auth')->put('/taxistas/ubicacion', [TaxistaUbicacionController::class, 'update']);
+
 
 
 
