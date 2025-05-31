@@ -107,13 +107,18 @@ class ReservaController extends Controller
         }
 
         // 5. Seleccionar el mejor taxista según prioridad
-        $taxista = $taxistasDisponibles
-            ->sortBy([
-                fn($a) => $a->ultimo_viaje ?? '1970-01-01 00:00:00',
-                fn($a) => $a->created_at
-            ])
-            ->first();
+        $taxista = $taxistasDisponibles->sort(function ($a, $b) {
+            $aFecha = $a->ultimo_viaje ?? '1970-01-01 00:00:00';
+            $bFecha = $b->ultimo_viaje ?? '1970-01-01 00:00:00';
 
+            // Orden ascendente por último viaje (el más viejo primero)
+            if ($aFecha === $bFecha) {
+                // Desempatar por created_at (el más antiguo primero)
+                return $a->created_at <=> $b->created_at;
+            }
+
+            return $aFecha <=> $bFecha;
+        })->first();
 
             if ($taxista == null) {
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde. [' . now()->timestamp . '] ');
@@ -150,7 +155,6 @@ class ReservaController extends Controller
         }
 
         Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
-        $taxista->estado_taxistas_id = 3;
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
