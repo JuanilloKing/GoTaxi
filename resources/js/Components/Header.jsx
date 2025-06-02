@@ -96,23 +96,17 @@ export default function Header() {
             <NavLink href={route('taxistas.show', taxistaId)}>
               Ver servicios
             </NavLink>
-          ) : (
-            <NavLink href={isLoggedIn ? '/reservar' : '/register'}>
-              Reservar taxi
-            </NavLink>
-          )}
-
+          ) : null}
           {isTaxista && hasReservaActiva && (
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full pointer-events-none"></span>
           )}
         </div>
 
-        {!isLoggedIn && (
+        {user?.is_admin && (
           <>
-            <NavLink href="/login">Iniciar sesión</NavLink>
-            <NavLink href="/registrar-taxista">Taxistas</NavLink>
+            <NavLink href="/registrar-taxista">Dar de alta taxista</NavLink>
           </>
-        )}
+        )}  
 
         {isLoggedIn && (
           <div className="relative z-50">

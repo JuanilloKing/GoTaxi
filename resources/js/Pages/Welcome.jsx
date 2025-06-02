@@ -82,7 +82,7 @@ export default function Welcome({ auth }) {
                 <Link
                   href="/register"
                   className="text-black border border-gray-400 px-6 py-2 rounded hover:bg-gray-100"
-                >
+                > 
                   ¿No tienes cuenta? Regístrate
                 </Link>
               </div>

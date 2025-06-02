@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import Header from '@/Layouts/Header';
+import Header from '@/Components/Header';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ConfirmPassword() {

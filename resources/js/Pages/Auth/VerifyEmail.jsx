@@ -1,5 +1,5 @@
 import PrimaryButton from '@/Components/PrimaryButton';
-import Header from '@/Layouts/Header';
+import Header from '@/Components/Header';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }) {
