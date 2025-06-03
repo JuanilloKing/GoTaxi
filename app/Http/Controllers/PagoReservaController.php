@@ -28,16 +28,19 @@ class PagoReservaController extends Controller
 
         $session = StripeSession::create([
             'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => [
-                        'name' => 'Reserva de viaje',
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'product_data' => [
+                            'name' => 'Reserva de viaje',
+                            'description' => "Origen: {$reserva->origen} --> Destino: {$reserva->destino}",
+                        ],
+                        'unit_amount' => intval($reserva->precio * 100),
                     ],
-                    'unit_amount' => intval($reserva->precio * 100),
-                ],
-                'quantity' => 1,
-            ]],
+                    'quantity' => 1,
+                ]
+            ],
             'mode' => 'payment',
             'success_url' => route('pago.success', ['reserva' => $reserva->id]) . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('pago.cancel', $reserva->id),

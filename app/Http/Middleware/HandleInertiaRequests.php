@@ -42,7 +42,7 @@ class HandleInertiaRequests extends Middleware
                     }
 
                     return Reserva::where('taxista_id', $user->tipable_id)
-                        ->whereIn('estado_reservas_id', [2, 4])
+                        ->whereIn('estado_reservas_id', [1, 2, 4])
                         ->exists();
                 },
 

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
 
 export default function MisViajes({ auth, reservas }) {
+  const reservaPendiente = reservas.data.find(r => [1].includes(r.estado_reservas_id));
   const reservaActiva = reservas.data.find(r => [2, 4].includes(r.estado_reservas_id));
   const reservasAnteriores = reservas.data.filter(r => ![2, 4].includes(r.estado_reservas_id));
   const { flash } = usePage().props;
@@ -93,6 +94,32 @@ useEffect(() => {
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-12">
         <h1 className="text-4xl font-bold text-center mb-8">Mis Viajes</h1>
 
+        {/* Reserva pendiente */}
+
+        {reservaPendiente ? (
+          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
+            <h2 className="text-2xl font-semibold text-yellow-600 mb-4">Reserva Pendiente</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <p><strong>Origen:</strong> {reservaPendiente.origen}</p>
+              <p><strong>Destino:</strong> {reservaPendiente.destino}</p>
+              <p><strong>Pasajeros:</strong> {reservaPendiente.num_pasajeros}</p>
+              <p><strong>Vehículo adaptado:</strong> {reservaPendiente.minusvalido ? 'Sí' : 'No'}</p>
+              <p><strong>Fecha y hora recogida:</strong> {new Date(reservaPendiente.fecha_recogida).toLocaleString('es-ES')}</p>
+              <p><strong>Estado de la reserva:</strong> {reservaPendiente.estado_reservas.estado}</p>
+              <p><strong>Precio estimado:</strong> {reservaPendiente.precio} €</p>
+            </div>
+            <button
+              className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+              onClick={() => cancelarReserva(reservaPendiente.id)}
+            >
+              Cancelar Reserva
+            </button>
+            <p className="text-sm text-gray-500 mt-2 italic">
+              Buscando taxista... Se le notificará por correo electrónico cuando se asigne un taxista.
+            </p>
+          </div>
+        ) : null}
+
         {/* Reserva activa */}
         {reservaActiva ? (
           <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
@@ -106,15 +133,24 @@ useEffect(() => {
               <p><strong>Tiempo aproximado del viaje:</strong> {reservaActiva.duracion} min</p>
               <p><strong>Estado de la reserva:</strong> {reservaActiva.estado_reservas.estado}</p>
               <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
-              {tiempoLlegada && (
-                <p className="md:col-span-2 text-blue-600 font-semibold">
-                  🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
-                </p>
-              )}
-              {minutosDesdeUltimaActualizacion !== null && (
-                <p className="md:col-span-2 text-sm text-gray-500 italic">
-                  Última actualización: hace {minutosDesdeUltimaActualizacion} min
-                </p>
+              {reservaActiva.estado_reservas_id === 2 && (
+                <>
+                  {tiempoLlegada && minutosDesdeUltimaActualizacion <= 5 && (
+                    <p className="md:col-span-2 text-blue-600 font-semibold">
+                      🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
+                    </p>
+                  )}
+
+                  {minutosDesdeUltimaActualizacion !== null && (
+                    <p className={`md:col-span-2 text-sm italic ${
+                      minutosDesdeUltimaActualizacion > 5 ? 'text-red-500' : 'text-gray-500'
+                    }`}>
+                      {minutosDesdeUltimaActualizacion > 5
+                        ? '⚠️ La ubicación del taxista podría estar desactualizada.'
+                        : `Última actualización: hace ${minutosDesdeUltimaActualizacion} min`}
+                    </p>
+                  )}
+                </>
               )}
             </div>
             {!reservaActiva.pagado ? (
@@ -149,19 +185,26 @@ useEffect(() => {
                 )}
               </div>
             )}
-            <button
-              className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-              onClick={() => cancelarReserva(reservaActiva.id)}
-            >
-              Cancelar Reserva
-            </button>
-              <p className="text-sm text-red-500 mt-2 italic">
+            {reservaActiva.estado_reservas_id !== 4 && (
+              <>
+                <button
+                  className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                  onClick={() => cancelarReserva(reservaActiva.id)}
+                >
+                  Cancelar Reserva
+                </button>
+                <p className="text-sm text-red-500 mt-2 italic">
                   *Atención: realizar el abono no siempre garantiza realizar el pago completo, ya que es un precio estimado.
-              </p>
+                </p>
+              </>
+            )}
           </div>
         ) : (
-          <p className="text-center text-gray-500 italic">No tienes ninguna reserva activa.</p>
+          !reservaPendiente && (
+            <p className="text-center text-gray-500 italic">No tienes ninguna reserva activa.</p>
+          )
         )}
+
 
         {/* Historial de viajes */}
         <div className="mt-16">

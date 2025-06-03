@@ -134,11 +134,25 @@ const Create = () => {
 
 
   const clearRoute = () => {
-    setDirections(null);
-    originRef.current.value = '';
-    destinationRef.current.value = '';
-    setOrigin('');
-    setDestination('');
+  setDirections(null);
+  originRef.current.value = '';
+  destinationRef.current.value = '';
+  setOrigin('');
+  setDestination('');
+  setDistancia(null);
+  setDuracion(null);
+  setData({
+    origen: '',
+    destino: '',
+    distancia: 0,
+    duracion: 0,
+    precio: 0,
+    minusvalido: false,
+    anotaciones: '',
+    pasajeros: 0,
+    lat_origen: 0,
+    lon_origen: 0,
+  });
   };
 
   if (!isLoaded) return <div>Loading...</div>;

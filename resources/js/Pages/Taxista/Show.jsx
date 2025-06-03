@@ -29,6 +29,23 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
     }
   };
 
+  const cancelarReserva = (id) => {
+    if (confirm('¿Estás seguro de que quieres cancelar este servicio? Tu estado cambiará a "no disponible".')) {
+      post(route('reservas.cancelar', id), {
+        onSuccess: () => {
+          setReservaActiva(null);
+        }
+      });
+    }
+  };
+
+  const confirmarReserva = (id) => {
+      post(route('reservas.confirmar', id), {
+        onSuccess: () => {
+          setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
+        }
+      });
+  };
   return (
     <GuestLayout user={user}>
       <FlashMessage message={flash.success} type="success" />
@@ -56,6 +73,24 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
                   <span className="text-gray-400 italic">No hay anotaciones</span>
                 )}
               </p>
+
+               {reservaActiva.estado_reservas_id === 1 && (
+                <button
+                  onClick={() => confirmarReserva(reservaActiva.id)}
+                  className="mt-4 mr-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                >
+                  Aceptar servicio
+                </button>
+              )}
+
+               {reservaActiva.estado_reservas_id === 1 && (
+                <button
+                  onClick={() => cancelarReserva(reservaActiva.id)}
+                  className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                >
+                  Cancelar servicio
+                </button>
+              )}
 
               {reservaActiva.estado_reservas_id === 2 && (
                 <button

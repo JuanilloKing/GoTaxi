@@ -20,6 +20,28 @@ const RegisterTaxista = () => {
   const [provincias, setProvincias] = useState([]);
   const [municipios, setMunicipios] = useState([]);
   const [selectedProvincia, setSelectedProvincia] = useState('');
+  const [dniError, setDniError] = useState('');
+  
+  const validarDNI = (dni) => {
+    const dniRegex = /^(\d{8})([A-Z])$/i;
+    const match = dni.match(dniRegex);
+  
+    if (!match) return false;
+  
+      const numero = parseInt(match[1], 10);
+      const letra = match[2].toUpperCase();
+      const letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
+  
+      return letras[numero % 23] === letra;
+    };
+
+  // Validar teléfono
+    const [tlfnoError, setTlfnoError] = useState('');
+
+    const validarTlfno = (telefono) => {
+        const telefonoRegex = /^\d{9}$/;
+        return telefonoRegex.test(telefono);
+    };
 
   // Cargar provincias al montar
   useEffect(() => {
@@ -63,14 +85,51 @@ const RegisterTaxista = () => {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <div className="w-full max-w-4xl p-6 bg-white shadow-lg rounded-lg mt-4">
           <h1 className="text-2xl font-semibold mb-4 text-center">Registro de Taxista</h1>
-
           <form onSubmit={submit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Datos personales */}
               <TextField label="Nombre" name="nombre" value={data.nombre} error={errors.nombre} onChange={handleChange} />
               <TextField label="Apellidos" name="apellidos" value={data.apellidos} error={errors.apellidos} onChange={handleChange} />
-              <TextField label="Teléfono" name="telefono" value={data.telefono} error={errors.telefono} onChange={handleChange} type="tel" />
-              <TextField label="DNI" name="dni" value={data.dni} error={errors.dni} onChange={handleChange} />
+              <div>
+                  <InputLabel htmlFor="telefono" value="Teléfono" />
+                  <TextInput
+                    id="telefono"
+                      type="tel"
+                      name="telefono"
+                      value={data.telefono}
+                      onChange={(e) => setData('telefono', e.target.value)}
+                      onBlur={() => {
+                          if (!validarTlfno(data.telefono)) {
+                              setTlfnoError('El teléfono no es válido');
+                          } else {
+                              setTlfnoError('');
+                          }
+                      }}
+                      required
+                      className={`mt-1 block w-full ${tlfnoError ? 'border-red-500' : ''}`}
+                  />
+                  <InputError message={tlfnoError || errors.telefono} className="mt-2" />
+                </div>
+                <div> 
+                  <InputLabel htmlFor="dni" value="DNI" />
+                  <TextInput
+                    id="dni"
+                    type="text"
+                    name="dni"
+                      value={data.dni}
+                      onChange={(e) => setData('dni', e.target.value)}
+                      onBlur={() => {
+                          if (!validarDNI(data.dni)) {
+                              setDniError('El DNI no es válido');
+                          } else {
+                              setDniError('');
+                          }
+                      }}
+                      required
+                      className={`mt-1 block w-full ${dniError ? 'border-red-500' : ''}`}
+                  />
+                  <InputError message={dniError || errors.dni} className="mt-2" />
+                </div>
               <TextField label="Email" name="email" value={data.email} error={errors.email} onChange={handleChange} type="email" />
 
               {/* Select Provincia */}

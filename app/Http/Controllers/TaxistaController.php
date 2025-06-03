@@ -126,14 +126,14 @@ public function store(Request $request)
      */
     public function show(Request $request, Taxista $taxista)
     {
-    
+
     $reservaActiva = $taxista->reservas()
         ->with('cliente.user')
-        ->whereIn('estado_reservas_id', [2, 4])
+        ->whereIn('estado_reservas_id', [1, 2, 4])
         ->first();
     $reservasFinalizadas = $taxista->reservas()
         ->with('cliente.user')
-        ->whereNotIn('estado_reservas_id', [2, 4])
+        ->whereNotIn('estado_reservas_id', [1, 2, 4])
         ->whereDate('fecha_entrega', '!=', '1970-01-01')
         ->orderByDesc('fecha_entrega')
         ->paginate(5)

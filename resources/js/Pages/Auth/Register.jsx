@@ -19,7 +19,6 @@ const RegisterUser = () => {
         password_confirmation: '',
         tipable_type: 'Cliente',
     });
-
     const [dniError, setDniError] = useState('');
     const [tlfnoError, setTlfnoError] = useState('');
 

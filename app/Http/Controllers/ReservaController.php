@@ -178,6 +178,10 @@ class ReservaController extends Controller
 
     public function cancelado(Reserva $reserva)
     {
+        if ($reserva->estado_reservas_id !== [1,2]) {
+            return redirect()->back()->with('error', 'No se puede cancelar reservas en curso. [' . now()->timestamp . ']');
+        }
+
         $reserva->update(['estado_reservas_id' => 3]);
 
         $taxista = $reserva->taxista;
@@ -198,6 +202,38 @@ class ReservaController extends Controller
         $reserva->save();
 
         return back()->with('success', 'Reserva comenzada correctamente. [' . now()->timestamp . ']');
-}
+    }
+
+    public function confirmar(Reserva $reserva)
+    {
+        $reserva->update(['estado_reservas_id' => 2]);
+
+        $taxista = $reserva->taxista;
+
+        $taxista->estado_taxistas_id = 2;
+        $taxista->vehiculo->disponible = true;
+        $taxista->vehiculo->save();
+        $taxista->save();
+        $reserva->save();
+
+        // Enviar correo al cliente
+        
+        return back()->with('success', 'Reserva confirmada correctamente. [' . now()->timestamp . ']');
+    }
+
+    public function cancelar(Reserva $reserva)
+    {
+        $reserva->update(['estado_reservas_id' => 3]);
+
+        $taxista = $reserva->taxista;
+
+        $taxista->estado_taxistas_id = 3;
+        $taxista->vehiculo->disponible = true;
+        $taxista->vehiculo->save();
+        $taxista->save();
+        $reserva->save();
+
+        return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
+    }
 
 }
