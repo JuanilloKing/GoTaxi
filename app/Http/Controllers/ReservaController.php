@@ -124,7 +124,7 @@ class ReservaController extends Controller
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde. [' . now()->timestamp . '] ');
             }
 
-        $confirmada = 2;
+        $pendiente = 1;
         try {
             DB::beginTransaction();
         
@@ -139,7 +139,7 @@ class ReservaController extends Controller
                 'duracion' => $request->duracion,
                 'precio' => $request->precio,
                 'anotaciones' => $request->anotaciones,
-                'estado_reservas_id' => $confirmada,
+                'estado_reservas_id' => $pendiente,
                 'fecha_estado' => $fecha_reserva,
                 'minusvalido' => $request->minusvalido,
                 'num_pasajeros' => $request->pasajeros,

@@ -118,6 +118,16 @@ export default function Header() {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 bg-white border rounded shadow-lg">
                 <ul className="p-2" style={{ width: '170px' }}>
+                  {!isTaxista && (
+                  <li>
+                      <Link
+                        href="/reservar"
+                        className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                      >
+                      Hacer reserva
+                    </Link>
+                  </li>
+                  )}
                   <li>
                   {isTaxista ? (
                   <div className="block px-4 py-2 text-gray-800 flex items-center gap-2 cursor-default">
