@@ -5,9 +5,9 @@ export default function Principal({ children, auth }) {
   const isLoggedIn = !!auth?.user
 
   return (
-    <div>
+    <div className='min-h-screen flex flex-col'>
       <Header isLoggedIn={isLoggedIn} />
-      <main className="p-6">{children}</main>
+      <main className="flex-grow">{children}</main>
       <Footer />
     </div>
   )

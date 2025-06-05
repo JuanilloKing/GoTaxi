@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
+import Principal from '@/Layouts/Principal';
 
 const Index = () => {
   const { provincias, filters = {}, editable = false } = usePage().props;
@@ -53,8 +54,7 @@ const Index = () => {
   };
 
   return (
-    <>
-      <Header />
+    <Principal>
       <main className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Tarifas por Provincia</h1>
 
@@ -166,8 +166,7 @@ const Index = () => {
           ))}
         </div>
       </main>
-      <Footer />
-    </>
+      </Principal>
   );
 };
 

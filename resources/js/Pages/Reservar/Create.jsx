@@ -230,49 +230,50 @@ const Create = () => {
               Precio: {data.precio} €
             </div>
           )}
-          <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox"
-                  checked={data.minusvalido}
-                  onChange={(e) => setData('minusvalido', e.target.checked)}
-                />
-                <span>Taxi minusválido</span>
-              </label>
-            </div>
-            <div>
-              <label className="block mb-2">Número de pasajeros:</label>
-              <input
-                type="number"
-                className="border p-2 rounded w-full"
-                min="1"
-                max="8"
-                onChange={(e) => setData('pasajeros', e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Anotaciones para el taxista:</label>
-              <textarea
-                className="border p-2 rounded w-full"
-                rows="4"
-                onChange={(e) => setData('anotaciones', e.target.value)}
-              ></textarea>
-            </div>
-            {distancia && duracion && (
-              <div className="flex flex-col sm:flex-row gap-4 justify-between mt-4">
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
-                >
-                  Reservar taxi ahora
-                </button>
-              </div>
-            )}
-          </form>
+<form className="mt-4 space-y-4" onSubmit={handleSubmit}>
+  <div>
+    <label className="flex items-center space-x-2">
+      <input
+        type="checkbox"
+        className="form-checkbox"
+        checked={data.minusvalido}
+        onChange={(e) => setData('minusvalido', e.target.checked)}
+      />
+      <span>Taxi minusválido</span>
+    </label>
+  </div>
+  <div>
+    <label className="block mb-2">Número de pasajeros:</label>
+    <input
+      type="number"
+      className="border p-2 rounded w-3/4 md:w-1/2"
+      min="1"
+      max="8"
+      onChange={(e) => setData('pasajeros', e.target.value)}
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Anotaciones para el taxista:</label>
+    <textarea
+      className="border p-2 rounded w-3/4 md:w-1/2"
+      rows="4"
+      onChange={(e) => setData('anotaciones', e.target.value)}
+    ></textarea>
+  </div>
+  {distancia && duracion && (
+    <div className="flex flex-col sm:flex-row gap-4 justify-between mt-4">
+      <button
+        type="submit"
+        disabled={processing}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+      >
+        Reservar taxi ahora
+      </button>
+    </div>
+  )}
+</form>
+
         </div>
       </div>
       <Footer />

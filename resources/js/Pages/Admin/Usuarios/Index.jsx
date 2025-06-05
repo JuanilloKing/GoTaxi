@@ -3,6 +3,7 @@ import { usePage, Link, router } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 import FlashMessage from '@/Components/FlashMensaje';
+import Principal from '@/Layouts/Principal';
 
 export default function UsuariosIndex() {
   const { flash } = usePage().props;
@@ -37,8 +38,7 @@ export default function UsuariosIndex() {
   };
 
   return (
-    <>
-      <Header />
+    <Principal auth={auth}>
             <FlashMessage message={flash.success} type="success" />
             <FlashMessage message={flash.error} type="error" />
       <main className="max-w-6xl mx-auto px-4 py-8">
@@ -120,7 +120,6 @@ export default function UsuariosIndex() {
           ))}
         </div>
       </main>
-      <Footer />
-    </>
+    </Principal>
   );
 }

@@ -215,7 +215,7 @@ useEffect(() => {
             <>
               <ul className="space-y-6">
                 {reservasAnteriores.map((reserva, i) => (
-                  <li key={i} className="p-6 bg-white rounded-xl shadow border border-gray-100">
+                  <li key={i} className="p-6 rounded-xl shadow border border-gray-400 bg-gray-100">
                     <div className="grid md:grid-cols-2 gap-4">
                       <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString('es-ES')}</p>
                       {reserva.estado_reservas_id !== 3 && (
