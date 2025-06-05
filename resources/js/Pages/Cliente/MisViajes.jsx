@@ -135,7 +135,7 @@ useEffect(() => {
               <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
               {reservaActiva.estado_reservas_id === 2 && (
                 <>
-                  {tiempoLlegada && minutosDesdeUltimaActualizacion <= 5 && (
+                  {minutosDesdeUltimaActualizacion <= 5 && (
                     <p className="md:col-span-2 text-blue-600 font-semibold">
                       🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
                     </p>

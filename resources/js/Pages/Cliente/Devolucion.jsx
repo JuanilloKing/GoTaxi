@@ -8,7 +8,7 @@ export default function Devolucion({ reserva }) {
       <Header />
 
       <main className="flex-grow flex items-center justify-center px-4">
-        <div className="bg-white p-8 rounded-xl shadow max-w-xl w-full text-center space-y-6">
+        <div className="p-8 rounded-xl shadow max-w-xl w-full text-center space-y-6 bg-gray-200">
           <h1 className="text-3xl font-bold text-gray-800">Solicitud de Reembolso</h1>
           <p>Has pagado <strong>{reserva.precio} €</strong> por este servicio.</p>
           <p className="text-sm text-gray-600">

@@ -15,28 +15,6 @@ export default function Header() {
   const isTaxista = user?.tipable_type === 'App\\Models\\Taxista';
   useEffect(() => {
   if (!isTaxista) return;
-
-  const interval = setInterval(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-
-        fetch('/taxistas/ubicacion', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-          },
-          body: JSON.stringify({
-            lat: latitude,
-            lng: longitude,
-          }),
-        });
-      });
-    }
-  }, 5000);
-
-  return () => clearInterval(interval);
 }, [isTaxista]);
 
   const taxistaId = isTaxista ? user.tipable_id : null;
@@ -170,7 +148,7 @@ export default function Header() {
                       href="/admin/usuarios"
                       className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                     >
-                      Gestionar users
+                      Gestion usuarios
                     </Link>
                   </li>
                     <li>
@@ -186,7 +164,7 @@ export default function Header() {
                         href="/admin/mensajes"
                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
                       >
-                        Ver Mensajes
+                        Ver mensajes
                       </Link>
                     </li>
                   </>

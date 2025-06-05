@@ -36,16 +36,38 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
           setReservaActiva(null);
         }
       });
-    }
+    } 
   };
 
-  const confirmarReserva = (id) => {
-      post(route('reservas.confirmar', id), {
-        onSuccess: () => {
-          setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
-        }
-      });
-  };
+const confirmarReserva = (id) => {
+  if (!navigator.geolocation) {
+    alert('La geolocalización no está disponible en tu navegador.');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;  
+post(
+  route('reservas.confirmar', id),
+  {
+    lat: latitude,
+    lng: longitude,
+  },
+  {
+    onSuccess: () => {
+      setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
+    },
+  }
+);
+    },
+    (error) => {
+      alert('No se pudo obtener la ubicación: ' + error.message);
+    },
+    { enableHighAccuracy: true }
+  );
+};
+
   return (
     <GuestLayout user={user}>
       <FlashMessage message={flash.success} type="success" />
@@ -132,7 +154,8 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
                     <p><strong>Recogida:</strong> {reserva.origen}</p>
                     <p><strong>Destino:</strong> {reserva.destino}</p>
                     <p><strong>Cliente:</strong> {reserva.cliente?.user?.nombre}</p>
-                    <p><strong>Fecha:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
+                    <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString()}</p>
+                    <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
