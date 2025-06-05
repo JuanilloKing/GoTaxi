@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reservas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cliente_id')->constrained();
-            $table->foreignId('taxista_id')->constrained();
+            $table->foreignId('taxista_id')->constrained()->nullable();
             $table->timestamp('fecha_reserva');
             $table->timestamp('fecha_recogida');            //fecha en la que se recoge al cliente
             $table->timestamp('fecha_entrega')->nullable();

@@ -26,6 +26,7 @@ class Reserva extends Model
         'estado_reservas_id',
         'minusvalido',
         'stripe_payment_intent_id',
+        'ciudad_origen',
     ];
 
     public function estado_reservas()

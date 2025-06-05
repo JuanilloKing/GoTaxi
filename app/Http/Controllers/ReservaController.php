@@ -11,6 +11,7 @@ use App\Mail\ReservaCreada;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Jobs\VerificarConfirmacionReserva;
 
 class ReservaController extends Controller
 {
@@ -124,7 +125,7 @@ class ReservaController extends Controller
                 return redirect()->back()->with('error', 'No hay taxista disponibles. Intentelo más tarde. [' . now()->timestamp . '] ');
             }
 
-        $pendiente = 1;
+            $pendiente = 1;
         try {
             DB::beginTransaction();
         
@@ -143,6 +144,7 @@ class ReservaController extends Controller
                 'fecha_estado' => $fecha_reserva,
                 'minusvalido' => $request->minusvalido,
                 'num_pasajeros' => $request->pasajeros,
+                'ciudad_origen' => $ciudadOrigen,
             ]);
             DB::commit();
             $taxista->estado_taxistas_id = 2;
@@ -155,6 +157,7 @@ class ReservaController extends Controller
         }
 
         Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
+        VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(1));
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
