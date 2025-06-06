@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\ReservaCancelada;
 use App\Mail\ReservaCreada;
 use App\Models\Reserva;
 use App\Models\Taxista;
@@ -109,15 +110,8 @@ class VerificarConfirmacionReserva implements ShouldQueue
         $clienteEmail = $reserva->cliente->user->email ?? null;
 
         if ($clienteEmail) {
-            Mail::raw(
-                "Lamentablemente no pudimos encontrar un taxista disponible para su reserva #{$reserva->id}. Por favor, inténtelo nuevamente más tarde.",
-                function ($message) use ($clienteEmail) {
-                    $message->to($clienteEmail)
-                        ->subject('Reserva cancelada por falta de disponibilidad');
-                }
-            );
+            Mail::to($clienteEmail)->send(new ReservaCancelada($reserva));
         }
-
         $reserva->delete();
     }
 }
