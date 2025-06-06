@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\ReservaCreada;
 use App\Models\Reserva;
 use App\Models\Taxista;
 use Illuminate\Bus\Queueable;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class VerificarConfirmacionReserva implements ShouldQueue
 {
@@ -24,20 +26,43 @@ class VerificarConfirmacionReserva implements ShouldQueue
 
     public function handle()
     {
-        $reserva = Reserva::find($this->reservaId);
 
-        if (!$reserva || $reserva->estado_reservas_id !== 1) {
-            // Ya fue aceptada o cancelada
+        $reserva = Reserva::find($this->reservaId);
+        if (!$reserva) {
+            Log::warning("❌ Reserva ID {$this->reservaId} no encontrada.");
             return;
         }
 
-        $ciudadOrigen = $reserva->ciudad_origen; // Asegúrate de tener este campo
+        if ($reserva->estado_reservas_id !== 1) {
+            return;
+        }
+
+        $taxistaAnteriorId = $reserva->taxista_id;
+        $taxistaAnterior = Taxista::find($taxistaAnteriorId);
+
+        // Marcar al taxista anterior como NO DISPONIBLE (2)
+        if ($taxistaAnterior) {
+            $taxistaAnterior->estado_taxistas_id = 3;
+            if ($taxistaAnterior->vehiculo) {
+                $taxistaAnterior->vehiculo->disponible = true;
+                $taxistaAnterior->vehiculo->save();
+            }
+            $taxistaAnterior->save();
+
+        }
+
+        $ciudadOrigen = $reserva->ciudad_origen;
         $pasajeros = $reserva->num_pasajeros;
         $requiereAccesibilidad = $reserva->minusvalido;
 
         $taxistasEnCiudad = Taxista::whereHas('municipio', function ($query) use ($ciudadOrigen) {
             $query->where('municipio', $ciudadOrigen);
         })->get();
+
+        if ($taxistasEnCiudad->isEmpty()) {
+            Log::warning("⚠️ No hay taxistas en la ciudad: {$ciudadOrigen}.");
+            return $this->cancelarReserva($reserva);
+        }
 
         $taxistasDisponibles = $taxistasEnCiudad->filter(function ($taxista) use ($pasajeros) {
             return $taxista->vehiculo &&
@@ -51,31 +76,48 @@ class VerificarConfirmacionReserva implements ShouldQueue
         }
 
         if ($taxistasDisponibles->isEmpty()) {
-            $reserva->update([
-                'estado_reservas_id' => 3, // Rechazada o no asignada
-                'taxista_id' => null,
-            ]);
-
-            Log::info("Reserva #{$reserva->id} no pudo ser asignada. No hay taxistas disponibles.");
-            return;
+            Log::warning("🚫 No hay taxistas disponibles que cumplan los requisitos para la reserva #{$reserva->id}.");
+            return $this->cancelarReserva($reserva);
         }
 
         $taxista = $taxistasDisponibles->sort(function ($a, $b) {
             $aFecha = $a->ultimo_viaje ?? '1970-01-01 00:00:00';
             $bFecha = $b->ultimo_viaje ?? '1970-01-01 00:00:00';
-
             return $aFecha <=> $bFecha ?: $a->created_at <=> $b->created_at;
         })->first();
 
-        // Reasignar reserva
+        // Asignar nuevo taxista a la reserva
         $reserva->update([
             'taxista_id' => $taxista->id,
-            'estado_reservas_id' => 1, // Sigue pendiente
         ]);
 
-        Log::info("Reserva #{$reserva->id} reasignada a taxista #{$taxista->id}.");
+        $taxista->estado_taxistas_id = 2; 
+        $taxista->vehiculo->disponible = false;
+        $taxista->vehiculo->save();
+        $taxista->save();
 
-        // Re-disparar job en 5 minutos por si este tampoco acepta
-        self::dispatch($reserva->id)->delay(now()->addMinutes(5));
+
+        // Re-despachar el job para ejecutar en 1 minuto
+        self::dispatch($reserva->id)->delay(now()->addMinutes(1));
+
+        // Enviar email al nuevo taxista
+        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
+    }
+
+    protected function cancelarReserva($reserva)
+    {
+        $clienteEmail = $reserva->cliente->user->email ?? null;
+
+        if ($clienteEmail) {
+            Mail::raw(
+                "Lamentablemente no pudimos encontrar un taxista disponible para su reserva #{$reserva->id}. Por favor, inténtelo nuevamente más tarde.",
+                function ($message) use ($clienteEmail) {
+                    $message->to($clienteEmail)
+                        ->subject('Reserva cancelada por falta de disponibilidad');
+                }
+            );
+        }
+
+        $reserva->delete();
     }
 }

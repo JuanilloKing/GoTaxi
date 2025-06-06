@@ -208,14 +208,13 @@ public function store(Request $request)
 
     
         public function cambiarEstado()
-        {   
+        { 
             $user = Auth::user();
             
             if (!$user || $user->tipable_type !== 'App\\Models\\Taxista') {
                 abort(403, 'No autorizado.');
             }
             $taxista = $user->tipable;
-
             if ($taxista->estado_taxistas_id == 2) {
                 return back()->with('error', 'No puedes cambiar el estado teniendo un servicio activo. [' . now()->timestamp . ']');
             }

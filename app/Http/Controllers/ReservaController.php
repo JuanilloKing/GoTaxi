@@ -128,7 +128,7 @@ class ReservaController extends Controller
             $pendiente = 1;
         try {
             DB::beginTransaction();
-        
+
             $reserva = Reserva::create([
                 'cliente_id' => $tipable->id,
                 'taxista_id' => $taxista->id,

@@ -5,6 +5,7 @@ import { usePage } from '@inertiajs/react';
 import FlashMessage from '@/Components/FlashMensaje';
 import { useEffect, useState } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
+import Principal from '@/Layouts/Principal';
 
 export default function MisViajes({ auth, reservas }) {
   const reservaPendiente = reservas.data.find(r => [1].includes(r.estado_reservas_id));
@@ -88,7 +89,7 @@ useEffect(() => {
 
   return (
     <div>
-      <Header />
+      <Principal>
       <FlashMessage message={flash.success} type="success" />
       <FlashMessage message={flash.error} type="error" />
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-12">
@@ -270,7 +271,7 @@ useEffect(() => {
           )}
         </div>
       </div>
-      <Footer />
+      </Principal>
     </div>
   );
 };
