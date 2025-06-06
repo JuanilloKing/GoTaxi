@@ -155,7 +155,7 @@ const Create = () => {
   });
   };
 
-  if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded) return <div>Cargando...</div>;
 
   return (
     <div>
@@ -191,12 +191,6 @@ const Create = () => {
                 onClick={calculateRoute}
               >
                 Mostrar Ruta
-              </button>
-              <button
-                className="bg-gray-400 text-white p-2 rounded w-full sm:w-auto"
-                onClick={clearRoute}
-              >
-                Limpiar
               </button>
             </div>
           </div>

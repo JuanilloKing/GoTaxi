@@ -124,7 +124,7 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
 
 Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
 
-
+    
     // Ruta de pagos
 Route::middleware(['auth'])->group(function () {
     Route::get('/reserva/{reserva}/pagar', [PagoReservaController::class, 'checkout'])->name('pago.reserva');

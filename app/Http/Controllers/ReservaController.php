@@ -163,6 +163,10 @@ class ReservaController extends Controller
 
     public function finalizar(Reserva $reserva)
     {
+        if ($reserva->estado_reservas_id !== 4) {
+            return redirect()->back()->with('error', 'No se puede finalizar reservas que no están en curso. [' . now()->timestamp . ']');
+        }
+
         $reserva->update(['fecha_entrega' => now()]);
 
         $reserva->update(['estado_reservas_id' => 5]);
@@ -200,6 +204,9 @@ class ReservaController extends Controller
 
     public function comenzar(Reserva $reserva)
     {
+        if ($reserva->estado_reservas_id !== 2) {
+            return redirect()->back()->with('error', 'No se puede comenzar reservas que no están confirmadas. [' . now()->timestamp . ']');
+        }
         $reserva->estado_reservas_id = 4;
         $reserva->fecha_recogida = now();
         $reserva->save();
@@ -209,6 +216,9 @@ class ReservaController extends Controller
 
     public function confirmar(Request $request, Reserva $reserva)
     {
+        if ($reserva->estado_reservas_id !== 1) {
+            return redirect()->back()->with('error', 'No se puede confirmar reservas que no están pendientes. [' . now()->timestamp . ']');
+        }
         $reserva->update(['estado_reservas_id' => 2]);
 
         $taxista = $reserva->taxista;
@@ -231,16 +241,10 @@ class ReservaController extends Controller
 
     public function cancelar(Reserva $reserva)
     {
-        $reserva->update(['estado_reservas_id' => 3]);
-
-        $taxista = $reserva->taxista;
-
-        $taxista->estado_taxistas_id = 3;
-        $taxista->vehiculo->disponible = true;
-        $taxista->vehiculo->save();
-        $taxista->save();
-        $reserva->save();
-
+        if ($reserva->estado_reservas_id !== 4 && $reserva->estado_reservas_id !== 5) {
+            return redirect()->back()->with('error', 'No se puede cancelar reservas en curso o ya finalizadas. [' . now()->timestamp . ']');
+        }
+        VerificarConfirmacionReserva::dispatch($reserva->id);
         return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
     }
 

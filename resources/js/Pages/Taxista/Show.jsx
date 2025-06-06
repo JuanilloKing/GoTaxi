@@ -40,9 +40,12 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
   };
 
 const confirmarReserva = (id) => {
-  if (!navigator.geolocation) {
-    alert('La geolocalización no está disponible en tu navegador.');
-    return;
+  if (confirm('¿Estás seguro de que quieres aceptar este servicio?')) {  
+        post(route('reservas.confirmar', id), {
+        onSuccess: () => {
+        setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
+        }
+      });
   }
 
   navigator.geolocation.getCurrentPosition(

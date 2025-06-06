@@ -2,13 +2,13 @@ import React from 'react';
 import {Link, usePage } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
+import Principal from '@/Layouts/Principal';
 
 export default function Index() {
   const { contactos } = usePage().props;
 
   return (
-    <>
-    <Header />
+    <Principal>
       <div className="p-6 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Mensajes de contacto</h1>
 
@@ -36,7 +36,6 @@ export default function Index() {
           ))}
         </div>
       </div>
-      <Footer />
-    </> 
+      </Principal>
   );
 }

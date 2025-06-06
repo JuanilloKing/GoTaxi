@@ -1,7 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import Header from '@/Components/Header';
-import Footer from '@/Components/Footer';
-import Ventajas from '@/Components/Ventajas';
+import Principal from '@/Layouts/Principal';
 
 export default function CrearValoracion({ reserva }) {
   const { data, setData, post, processing, errors } = useForm({
@@ -19,7 +17,7 @@ export default function CrearValoracion({ reserva }) {
   
   return (
     <div>
-      <Header />
+      <Principal>
       <div className="max-w-3xl mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-center">Valorar tu viaje</h1>
 
@@ -74,8 +72,7 @@ export default function CrearValoracion({ reserva }) {
           </button>
         </form>
       </div>
-      <Ventajas />
-      <Footer />
+      </Principal>
 
       {/* Estilos de las estrellas */}
       <style>{`
