@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\VerificarConfirmacionReserva;
+use App\Mail\ReservaConfirmadaCliente;
 
 class ReservaController extends Controller
 {
@@ -222,6 +223,7 @@ class ReservaController extends Controller
         $reserva->update(['estado_reservas_id' => 2,
                         'fecha_recogida' => now()]);
 
+        
         $taxista = $reserva->taxista;
 
         // Actualizar ubicación si está disponible
@@ -236,6 +238,7 @@ class ReservaController extends Controller
         $taxista->vehiculo->save();
         $taxista->save();
         // enviar correo al cliente
+        Mail::to($reserva->cliente->user->email)->send(new ReservaConfirmadaCliente($reserva));
         return back()->with('success', 'Reserva confirmada correctamente.');
     }
 
