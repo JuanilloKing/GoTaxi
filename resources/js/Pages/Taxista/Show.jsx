@@ -157,6 +157,7 @@ post(
                     <p><strong>Recogida:</strong> {reserva.origen}</p>
                     <p><strong>Destino:</strong> {reserva.destino}</p>
                     <p><strong>Cliente:</strong> {reserva.cliente?.user?.nombre}</p>
+                    <p><strong>Pagado a traves de Gotaxi:</strong> {reserva.pagado ? '✔️ Sí' : '❌ No'}</p>
                     <p><strong>Fecha recogida:</strong> {new Date(reserva.fecha_recogida).toLocaleString()}</p>
                     <p><strong>Fecha llegada:</strong> {new Date(reserva.fecha_entrega).toLocaleString()}</p>
                   </div>

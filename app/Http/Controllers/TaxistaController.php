@@ -153,16 +153,17 @@ public function store(Request $request)
      */
     public function edit(Taxista $taxista)
     {
-        // Obtén el taxista autenticado
         $taxista = Auth::user()->tipable;
-        // Si el usuario no es un taxista, redirige o muestra un error
+
         if (!$taxista) {
             return redirect()->route('home')->with('error', 'No tienes acceso a esta página.');
-        }   
-        // Retorna la vista de edición con los datos del taxista
-        return inertia('Taxista/Edit', ['taxista' => $taxista,
-                                        'vehiculo' => $taxista->vehiculo]);
-        
+        }
+
+        return inertia('Taxista/Edit', [
+            'taxista' => $taxista,
+            'vehiculo' => $taxista->vehiculo,
+            'usuario' => Auth::user(),
+        ]);
     }
 
     /**

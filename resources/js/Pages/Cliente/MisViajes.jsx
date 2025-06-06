@@ -32,7 +32,7 @@ const cancelarReserva = (id) => {
 };
 
 const { isLoaded } = useJsApiLoader({
-  googleMapsApiKey: import.meta.env.VITE_GOOGLE_APY_KEY, // asegúrate que la clave sea válida
+  googleMapsApiKey: import.meta.env.VITE_GOOGLE_APY_KEY,
   libraries: ['places'],
 });
 
@@ -130,10 +130,14 @@ useEffect(() => {
               <p><strong>Destino:</strong> {reservaActiva.destino}</p>
               <p><strong>Pasajeros:</strong> {reservaActiva.num_pasajeros}</p>
               <p><strong>Vehículo adaptado:</strong> {reservaActiva.minusvalido ? 'Sí' : 'No'}</p>
-              <p><strong>Fecha y hora recogida:</strong> {new Date(reservaActiva.fecha_recogida).toLocaleString('es-ES')}</p>
+              <p><strong>Fecha y hora reserva:</strong> {new Date(reservaActiva.fecha_reserva).toLocaleString('es-ES')}</p>
               <p><strong>Tiempo aproximado del viaje:</strong> {reservaActiva.duracion} min</p>
               <p><strong>Estado de la reserva:</strong> {reservaActiva.estado_reservas.estado}</p>
               <p><strong>Precio estimado:</strong> {reservaActiva.precio} €</p>
+              <p><strong>Nombre taxista:</strong> {reservaActiva.taxista.users.nombre}</p>
+              <p><strong>Marca y modelo vehiculo:</strong> {reservaActiva.taxista.vehiculo.marca} {reservaActiva.taxista.vehiculo.modelo}</p>
+              <p><strong>Color:</strong> {reservaActiva.taxista.vehiculo.color}</p>
+              <p><strong>Matricula:</strong> {reservaActiva.taxista.vehiculo.matricula}</p>
               {reservaActiva.estado_reservas_id === 2 && (
                 <>
                   {minutosDesdeUltimaActualizacion <= 5 && (

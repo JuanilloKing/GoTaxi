@@ -219,7 +219,8 @@ class ReservaController extends Controller
         if ($reserva->estado_reservas_id !== 1) {
             return redirect()->back()->with('error', 'No se puede confirmar reservas que no están pendientes. [' . now()->timestamp . ']');
         }
-        $reserva->update(['estado_reservas_id' => 2]);
+        $reserva->update(['estado_reservas_id' => 2,
+                        'fecha_recogida' => now()]);
 
         $taxista = $reserva->taxista;
 

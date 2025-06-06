@@ -7,13 +7,10 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
-export default function Edit({ taxista }) {
-    const { vehiculo } = usePage().props;
+export default function Edit({ taxista, vehiculo, usuario }) {
     const [showVehiculoForm, setShowVehiculoForm] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
-    const [dniError, setDniError] = useState('');
 
-    // Formulario del taxista
     const {
         data,
         setData,
@@ -23,14 +20,14 @@ export default function Edit({ taxista }) {
         reset,
         recentlySuccessful,
     } = useForm({
-        nombre: taxista.nombre || '',
-        apellidos: taxista.apellidos || '',
-        email: taxista.email || '',
-        dni: taxista.dni || '',
-        telefono: taxista.telefono || '',
+        nombre: usuario?.nombre || '',
+        apellidos: usuario?.apellidos || '',
+        email: usuario?.email || '',
+        telefono: usuario?.telefono || '',
         password: '',
         password_confirmation: '',
     });
+
 
     // Formulario del vehículo
     const {
@@ -61,30 +58,16 @@ export default function Edit({ taxista }) {
     const submit = (e) => {
         e.preventDefault();
 
-        const dni = data.dni.trim();
+        const datosFiltrados = { ...data };
 
-        if (dni !== '') {
-            const dniRegex = /^[0-9]{8}[A-Za-z]$/;
-            const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
-
-            if (!dniRegex.test(dni)) {
-                setDniError('El DNI debe tener 8 números seguidos de una letra. Ej: 12345678A');
-                return;
-            }
-
-            const numero = parseInt(dni.substring(0, 8), 10);
-            const letra = dni.substring(8).toUpperCase();
-            const letraCorrecta = letras[numero % 23];
-
-            if (letra !== letraCorrecta) {
-                setDniError(`La letra del DNI no es correcta.`);
-                return;
-            }
+        // Elimina campos vacíos innecesarios
+        if (!data.password) {
+            delete datosFiltrados.password;
+            delete datosFiltrados.password_confirmation;
         }
 
-        setDniError('');
-
         put(route('taxista.update'), {
+            data: datosFiltrados,
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
