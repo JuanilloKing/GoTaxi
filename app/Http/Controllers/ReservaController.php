@@ -157,8 +157,8 @@ class ReservaController extends Controller
             dd('Error al guardar reserva:', $e->getMessage());
         }
 
-        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
         VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(2));
+        Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
@@ -208,11 +208,13 @@ class ReservaController extends Controller
         if ($reserva->estado_reservas_id !== 2) {
             return redirect()->back()->with('error', 'No se puede comenzar reservas que no están confirmadas. [' . now()->timestamp . ']');
         }
-        $reserva->estado_reservas_id = 4;
-        $reserva->fecha_recogida = now();
-        $reserva->save();
-
-        return back()->with('success', 'Reserva comenzada correctamente. [' . now()->timestamp . ']');
+        else {
+            $reserva->estado_reservas_id = 4;
+            $reserva->fecha_recogida = now();
+            $reserva->save();
+    
+            return back()->with('success', 'Reserva comenzada correctamente. [' . now()->timestamp . ']');
+        }
     }
 
     public function confirmar(Request $request, Reserva $reserva)
@@ -220,26 +222,28 @@ class ReservaController extends Controller
         if ($reserva->estado_reservas_id !== 1) {
             return redirect()->back()->with('error', 'No se puede confirmar reservas que no están pendientes. [' . now()->timestamp . ']');
         }
-        $reserva->update(['estado_reservas_id' => 2,
-                        'fecha_recogida' => now()]);
-
-        
-        $taxista = $reserva->taxista;
-
-        // Actualizar ubicación si está disponible
-        if ($request->filled(['lat', 'lng'])) {
-            $taxista->lat = $request->lat;
-            $taxista->lng = $request->lng;
-            $taxista->ultima_actualizacion_localizacion = now();
+        else {
+            $reserva->update(['estado_reservas_id' => 2,
+                            'fecha_recogida' => now()]);
+    
+            
+            $taxista = $reserva->taxista;
+    
+            // Actualizar ubicación si está disponible
+            if ($request->filled(['lat', 'lng'])) {
+                $taxista->lat = $request->lat;
+                $taxista->lng = $request->lng;
+                $taxista->ultima_actualizacion_localizacion = now();
+            }
+    
+            $taxista->estado_taxistas_id = 2;
+            $taxista->vehiculo->disponible = true;
+            $taxista->vehiculo->save();
+            $taxista->save();
+            // enviar correo al cliente
+            Mail::to($reserva->cliente->user->email)->send(new ReservaConfirmadaCliente($reserva));
+            return back()->with('success', 'Reserva confirmada correctamente.');
         }
-
-        $taxista->estado_taxistas_id = 2;
-        $taxista->vehiculo->disponible = true;
-        $taxista->vehiculo->save();
-        $taxista->save();
-        // enviar correo al cliente
-        Mail::to($reserva->cliente->user->email)->send(new ReservaConfirmadaCliente($reserva));
-        return back()->with('success', 'Reserva confirmada correctamente.');
     }
 
 
@@ -248,8 +252,10 @@ class ReservaController extends Controller
         if ($reserva->estado_reservas_id !== 4 && $reserva->estado_reservas_id !== 5) {
             return redirect()->back()->with('error', 'No se puede cancelar reservas en curso o ya finalizadas. [' . now()->timestamp . ']');
         }
-        VerificarConfirmacionReserva::dispatch($reserva->id);
-        return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
+        else {
+            VerificarConfirmacionReserva::dispatch($reserva->id);
+            return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
+        }
     }
 
     public function tieneReservaActiva()
@@ -268,5 +274,23 @@ class ReservaController extends Controller
 
         return response()->json(['hasReservaActiva' => $tiene]);
     }
+
+    public function reservaActiva(Request $request)
+{
+    $user = $request->user();
+
+    $taxista = $user->tipable;
+
+    $reservaActiva = $taxista->reservas()
+        ->whereIn('estado_reservas_id', [1, 2, 4])
+        ->with(['cliente.user'])
+        ->latest()
+        ->first();
+
+    return response()->json([
+        'reservaActiva' => $reservaActiva,
+    ]);
+}
+
 
 }

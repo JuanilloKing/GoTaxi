@@ -2,12 +2,30 @@ import React, { useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import FlashMessage from '@/Components/FlashMensaje';
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 export default function Show({ auth, taxista, reservaActiva: initialReservaActiva, reservasFinalizadas }) {
   const user = auth.user;
   const { post } = useForm();
   const { flash } = usePage().props;
   const [reservaActiva, setReservaActiva] = useState(initialReservaActiva);
+
+  useEffect(() => {
+  const intervalo = setInterval(() => {
+    axios
+      .get(route('reservas.activa'))
+      .then((response) => {
+        setReservaActiva(response.data.reservaActiva);
+      })
+      .catch((error) => {
+        console.error('Error actualizando reserva activa:', error);
+      });
+  }, 5000); // Cada 5 segundos
+
+  return () => clearInterval(intervalo);
+}, []);
+
 
   const finalizarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
@@ -21,11 +39,17 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
 
   const comenzarReserva = (id) => {
     if (confirm('¿Estás seguro de que quieres comenzar este servicio?')) {
-      post(route('reservas.comenzar', id), {
-        onSuccess: () => {
+    post(route('reservas.comenzar', id), {
+      onSuccess: () => {
+        const { error } = usePage().props.flash;
+        if (!error) {
           setReservaActiva({ ...reservaActiva, estado_reservas_id: 4 });
         }
-      });
+        else {
+          setReservaActiva({ ...reservaActiva, estado_reservas_id: 3  });
+        }
+      }
+    });
     }
   };
 
@@ -40,36 +64,38 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
   };
 
 const confirmarReserva = (id) => {
-  if (confirm('¿Estás seguro de que quieres aceptar este servicio?')) {  
-        post(route('reservas.confirmar', id), {
-        onSuccess: () => {
-        setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
-        }
-      });
-  }
+  if (confirm('¿Estás seguro de que quieres aceptar este servicio?')) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const { latitude, longitude } = position.coords;  
-post(
-  route('reservas.confirmar', id),
-  {
-    lat: latitude,
-    lng: longitude,
-  },
-  {
-    onSuccess: () => {
-      setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
-    },
+        post(
+          route('reservas.confirmar', id),
+          {
+            lat: latitude,
+            lng: longitude,
+          },
+          {
+            onSuccess: () => {
+              const { error } = usePage().props.flash;
+              if (!error) {
+                setReservaActiva({ ...reservaActiva, estado_reservas_id: 2 });
+              } else {
+                setReservaActiva({ ...reservaActiva, estado_reservas_id: 3 });
+                alert(error); 
+              }
+            },
+          }
+        );
+      },
+      (error) => {
+        alert('No se pudo obtener la ubicación: ' + error.message);
+      },
+      { enableHighAccuracy: true }
+    );
   }
-);
-    },
-    (error) => {
-      alert('No se pudo obtener la ubicación: ' + error.message);
-    },
-    { enableHighAccuracy: true }
-  );
 };
+
 
   return (
     <GuestLayout user={user}>
