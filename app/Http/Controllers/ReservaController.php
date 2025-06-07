@@ -246,10 +246,10 @@ class ReservaController extends Controller
         }
     }
 
-
+    
     public function cancelar(Reserva $reserva)
     {
-        if ($reserva->estado_reservas_id !== 4 && $reserva->estado_reservas_id !== 5) {
+        if ($reserva->estado_reservas_id == 4 && $reserva->estado_reservas_id == 5) {
             return redirect()->back()->with('error', 'No se puede cancelar reservas en curso o ya finalizadas. [' . now()->timestamp . ']');
         }
         else {
@@ -284,6 +284,23 @@ class ReservaController extends Controller
     $reservaActiva = $taxista->reservas()
         ->whereIn('estado_reservas_id', [1, 2, 4])
         ->with(['cliente.user'])
+        ->latest()
+        ->first();
+
+    return response()->json([
+        'reservaActiva' => $reservaActiva,
+    ]);
+}
+
+public function reservaActivaCliente(Request $request)
+{
+    $user = $request->user();
+
+    $cliente = $user->tipable;
+
+    $reservaActiva = $cliente->reservas()
+        ->whereIn('estado_reservas_id', [2, 4])
+        ->with(['taxista.user', 'taxista.vehiculo', 'estado_reservas'])
         ->latest()
         ->first();
 

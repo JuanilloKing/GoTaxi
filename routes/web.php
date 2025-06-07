@@ -69,6 +69,9 @@ Route::post('/reservas/{reserva}/cancelar', [ReservaController::class, 'cancelar
 Route::middleware(['auth', 'verified'])->get('/reservas/activa', [ReservaController::class, 'reservaActiva'])
     ->name('reservas.activa');
 
+Route::middleware(['auth', 'verified'])->get('/reservas/activa-cliente', [ReservaController::class, 'reservaActivaCliente'])
+    ->name('reservas.activaCliente');
+
 Route::get('/taxista/editar', [TaxistaController::class, 'edit'])->name('taxista.edit');
 
 Route::put('/taxista/editar', [TaxistaController::class, 'update'])->name('taxista.update')->middleware('auth');
