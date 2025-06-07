@@ -60,7 +60,7 @@
     <h1>¡Tu reserva ha sido confirmada!</h1>
     </div>
     <div class="body">
-        <p>Hola {{ $reserva->cliente->users->nombre }},</p>
+        <p>Hola!! ,</p>
 
         <p>Tu reserva ha sido aceptada por un taxista.</p>
 
@@ -69,7 +69,7 @@
         <p>Gracias por confiar en nuestro servicio.</p>
 
     <div class="footer">
-        Este es un mensaje automático de {{ config('app.name') }}. Por favor, no respondas a este correo.
+        Este es un mensaje automático de Gotaxi. Por favor, no respondas a este correo.
     </div>
 </body>
 </html>

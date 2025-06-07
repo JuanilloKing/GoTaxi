@@ -139,9 +139,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/mensajes', [ContactoController::class, 'index'])->name('mensajes.index');
 });
 
-Route::middleware('auth')->put('/taxistas/ubicacion', [TaxistaUbicacionController::class, 'update']);
+Route::post('/taxista/ubicacion', [TaxistaUbicacionController::class, 'update'])
+    ->middleware('auth')
+    ->name('taxista.ubicacion.update');
 
 
+Route::get('/taxista/reserva-activa', [\App\Http\Controllers\ReservaController::class, 'tieneReservaActiva'])->name('taxista.reserva.activa');
 
 
 // routes/web.php

@@ -151,7 +151,7 @@ useEffect(() => {
                       minutosDesdeUltimaActualizacion > 5 ? 'text-red-500' : 'text-gray-500'
                     }`}>
                       {minutosDesdeUltimaActualizacion > 5
-                        ? '⚠️ La ubicación del taxista podría estar desactualizada.'
+                        ? '⚠️ La ubicación del taxista no está disponible.'
                         : `Última actualización: hace ${minutosDesdeUltimaActualizacion} min`}
                     </p>
                   )}

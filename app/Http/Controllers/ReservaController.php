@@ -158,7 +158,7 @@ class ReservaController extends Controller
         }
 
         Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
-        VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(1));
+        VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(2));
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }
 
@@ -250,6 +250,23 @@ class ReservaController extends Controller
         }
         VerificarConfirmacionReserva::dispatch($reserva->id);
         return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
+    }
+
+    public function tieneReservaActiva()
+    {
+        $user = Auth::user();
+
+        if ($user->tipable_type !== \App\Models\Taxista::class) {
+            return response()->json(['hasReservaActiva' => false]);
+        }
+
+        $taxista = $user->tipable;
+
+        $tiene = $taxista->reservas()
+            ->whereIn('estado_reservas_id', [1, 2, 4])
+            ->exists();
+
+        return response()->json(['hasReservaActiva' => $tiene]);
     }
 
 }

@@ -2,20 +2,73 @@ import { usePage, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import NavLink from './NavLink';
 import { useEffect } from 'react';
+import axios from '../bootstrap';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { auth } = usePage().props;
   const estadoId = auth.estado_id;
-  const hasReservaActiva = auth.hasReservaActiva;
   const user = auth.user;
   const isLoggedIn = !!user;
+  const [hasReservaActiva, setHasReservaActiva] = useState(auth.hasReservaActiva || false);
 
   const isTaxista = user?.tipable_type === 'App\\Models\\Taxista';
-  useEffect(() => {
-  if (!isTaxista) return;
+
+useEffect(() => {
+  if (!isTaxista || !("geolocation" in navigator)) return;
+
+  let intervalId = null;
+
+  const enviarUbicacion = (lat, lng) => {
+    axios.post(route('taxista.ubicacion.update'), {
+      lat,
+      lng,
+    }).catch(error => {
+      console.error('❌ Error al enviar ubicación:', error);
+    });
+  };
+
+  // Intentar obtener permiso inicial
+  navigator.geolocation.getCurrentPosition(
+    () => {
+      intervalId = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            enviarUbicacion(latitude, longitude);
+          },
+          (error) => {
+            console.warn('⚠️ Error obteniendo ubicación:', error);
+          }
+        );
+      }, 3000);
+    },
+    (error) => {
+      console.error('🚫 Permiso de geolocalización denegado o fallido:', error);
+    }
+  );
+
+  return () => {
+    if (intervalId) clearInterval(intervalId);
+  };
 }, [isTaxista]);
+
+  useEffect(() => {
+    if (!isTaxista) return;
+
+    const intervaloReserva = setInterval(() => {
+      axios.get(route('taxista.reserva.activa'))
+        .then(res => {
+          setHasReservaActiva(res.data.hasReservaActiva);
+        })
+        .catch(err => {
+          console.error('Error comprobando reserva activa:', err);
+        });
+    }, 5000);
+
+    return () => clearInterval(intervaloReserva);
+  }, [isTaxista]);
 
   const taxistaId = isTaxista ? user.tipable_id : null;
   const avatarUrl = user?.avatar_url || '/default-avatar.png';
@@ -58,6 +111,18 @@ export default function Header() {
       estado_id: nuevoEstado
     });
   };
+
+  const enviarUbicacion = (lat, lng) => {
+  router.post(route('taxista.ubicacion.update'), {
+    lat,
+    lng,
+  }, {
+    preserveScroll: true,
+    preserveState: true,
+    only: [], // no necesitas respuesta visible
+  });
+};
+
 
   return (
     <header className="bg-white p-4 shadow flex justify-between items-center">
