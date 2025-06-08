@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import Footer from '@/Components/Footer';
 
 export default function Edit({ taxista, vehiculo, usuario }) {
     const [showVehiculoForm, setShowVehiculoForm] = useState(false);
@@ -73,6 +74,7 @@ export default function Edit({ taxista, vehiculo, usuario }) {
     };
 
     return (
+        <>
         <GuestLayout>
             <Head title="Editar Perfil de Taxista" />
             <div className="flex flex-col items-center justify-center bg-gray-100">
@@ -203,5 +205,7 @@ export default function Edit({ taxista, vehiculo, usuario }) {
                 </div>
             </div>
         </GuestLayout>
+        <Footer />
+        </>
     );
 }
