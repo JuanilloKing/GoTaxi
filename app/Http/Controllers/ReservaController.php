@@ -157,7 +157,7 @@ class ReservaController extends Controller
             dd('Error al guardar reserva:', $e->getMessage());
         }
 
-        VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(2));
+        VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now()->addMinutes(1));
         Mail::to($taxista->users->email)->send(new ReservaCreada($reserva));
         return redirect()->route('home')->with('success', 'Reserva creada correctamente');
     }

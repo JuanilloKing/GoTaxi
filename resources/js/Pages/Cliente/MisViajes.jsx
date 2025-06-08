@@ -139,23 +139,24 @@ useEffect(() => {
               <p><strong>Color:</strong> {reservaActiva.taxista.vehiculo.color}</p>
               <p><strong>Matricula:</strong> {reservaActiva.taxista.vehiculo.matricula}</p>
               {reservaActiva.estado_reservas_id === 2 && (
-                <>
-                  {minutosDesdeUltimaActualizacion <= 5 && (
-                    <p className="md:col-span-2 text-blue-600 font-semibold">
-                      🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
+                <div className="md:col-span-2">
+                  {tiempoLlegada ? (
+                    <>
+                      <p className="text-blue-600 font-semibold">
+                        🚖 Tiempo aproximado de llegada del taxista: {tiempoLlegada}
+                      </p>
+                      {minutosDesdeUltimaActualizacion !== null && (
+                        <p className="text-sm italic text-gray-500">
+                          Última actualización: hace {minutosDesdeUltimaActualizacion} min
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-red-500 font-semibold">
+                      ⚠️ La ubicación del taxista no está disponible.
                     </p>
                   )}
-
-                  {minutosDesdeUltimaActualizacion !== null && (
-                    <p className={`md:col-span-2 text-sm italic ${
-                      minutosDesdeUltimaActualizacion > 5 ? 'text-red-500' : 'text-gray-500'
-                    }`}>
-                      {minutosDesdeUltimaActualizacion > 5
-                        ? '⚠️ La ubicación del taxista no está disponible.'
-                        : `Última actualización: hace ${minutosDesdeUltimaActualizacion} min`}
-                    </p>
-                  )}
-                </>
+                </div>
               )}
             </div>
             {!reservaActiva.pagado ? (

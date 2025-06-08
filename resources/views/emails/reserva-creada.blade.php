@@ -63,7 +63,7 @@
 
         <div class="body">
             <p>Hola <strong>{{ $reserva->taxista->users->nombre }}</strong>,</p>
-            <p>Se te ha asignado una nueva reserva Tienes 2 minutos para aceptarla o se asignará a otro taxista. Aquí tienes los detalles:</p>
+            <p>Se te ha asignado una nueva reserva Tienes 1 minuto para aceptarla o se asignará a otro taxista. Aquí tienes los detalles:</p>
             <ul>
                 <li><strong>Cliente:</strong> {{ $reserva->cliente->user->nombre }}</li>
                 <li><strong>Teléfono:</strong> {{ $reserva->cliente->user->telefono }}</li>

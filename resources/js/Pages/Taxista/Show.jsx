@@ -63,18 +63,12 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
     } 
   };
 
-const confirmarReserva = (id) => {
-  if (confirm('¿Estás seguro de que quieres aceptar este servicio?')) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-
+  const confirmarReserva = (id) => {
+    if (confirm('¿Estás seguro de que quieres aceptar este servicio?')) {
+      const realizarPost = (lat = null, lng = null) => {
         post(
           route('reservas.confirmar', id),
-          {
-            lat: latitude,
-            lng: longitude,
-          },
+          { lat, lng },
           {
             onSuccess: () => {
               const { error } = usePage().props.flash;
@@ -87,14 +81,22 @@ const confirmarReserva = (id) => {
             },
           }
         );
-      },
-      (error) => {
-        alert('No se pudo obtener la ubicación: ' + error.message);
-      },
-      { enableHighAccuracy: true }
-    );
-  }
-};
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          realizarPost(latitude, longitude);
+        },
+        () => {
+          // No mostramos alerta, simplemente hacemos el post sin ubicación
+          realizarPost();
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
 
 
   return (
