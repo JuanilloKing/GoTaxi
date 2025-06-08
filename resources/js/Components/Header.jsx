@@ -2,7 +2,7 @@ import { usePage, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import NavLink from './NavLink';
 import { useEffect } from 'react';
-import axios from '../bootstrap';
+import axios from 'axios';
 
 export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +27,7 @@ useEffect(() => {
     }).catch(error => {
       console.error('❌ Error al enviar ubicación:', error);
     });
-  };
+  };  
 
   // Intentar obtener permiso inicial
   navigator.geolocation.getCurrentPosition(

@@ -27,7 +27,7 @@ config.vm.provision "shell", inline: <<-SHELL
 
   # VirtualHost
   echo '<VirtualHost *:80>
-      ServerName www.GoTaxi
+      ServerName www.GoTaxi.com
       DocumentRoot /var/www/gotaxi/public
       <Directory /var/www/gotaxi/public>
           AllowOverride All
@@ -37,9 +37,24 @@ config.vm.provision "shell", inline: <<-SHELL
 
   sudo a2ensite gotaxi
   sudo systemctl reload apache2
+
+    # Install Composer
+    curl -sS https://getcomposer.org/installer | php
+    sudo mv composer.phar /usr/local/bin/composer
+
+    # Install Node.js (LTS 22.x)
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    # Instalar PostgreSQL
+  sudo apt-get install -y postgresql postgresql-contrib php8.2-pgsql
+
+  # Crear base de datos y usuario
+  sudo -u postgres psql -c "CREATE USER gotaxi WITH PASSWORD 'gotaxi';"
+  sudo -u postgres psql -c "CREATE DATABASE gotaxi OWNER gotaxi;"
+  sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE gotaxi TO gotaxi;"
 SHELL
 
 
-  config.vm.synced_folder ".", "/vagrant", owner: "www-data", group: "www-data", mount_options: ["dmode=775", "fmode=664"]
+  config.vm.synced_folder ".", "/vagrant", owner: "www-data", group: "www-data", mount_options: ["dmode=777", "fmode=777"]
 end
-

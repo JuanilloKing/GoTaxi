@@ -20,7 +20,7 @@ export default function Login({ status, canResetPassword }) {
             onFinish: () => reset('password'),
         });
     };
-    
+
     return (
         <GuestLayout>
             <Head title="Iniciar sesión" />

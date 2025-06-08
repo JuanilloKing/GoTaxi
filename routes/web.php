@@ -155,3 +155,9 @@ Route::get('/taxista/reserva-activa', [\App\Http\Controllers\ReservaController::
 // routes/web.php
 
 require __DIR__.'/auth.php';
+
+use Illuminate\Http\Request;
+
+Route::post('/prueba-csrf', function (Request $request) {
+    return response()->json(['ok' => true]);
+});
