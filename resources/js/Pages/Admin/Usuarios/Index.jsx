@@ -10,13 +10,32 @@ export default function UsuariosIndex() {
   const errorMessage = flash?.error;
   const successMessage = flash?.success;
   const { users, filters, auth } = usePage().props;
-  const [search, setSearch] = useState(filters.search || '');
 
-  // Buscar automáticamente a medida que se escribe
+  const [search, setSearch] = useState(filters.search || '');
+  const [roles, setRoles] = useState(filters.roles || []);
+
+  const toggleRole = (role) => {
+    const newRoles = roles.includes(role)
+      ? roles.filter((r) => r !== role)
+      : [...roles, role];
+
+    setRoles(newRoles);
+    // Ejecutar el filtro automáticamente al hacer clic
+    router.get(
+      route('admin.users.index'),
+      { search, roles: newRoles },
+      { preserveState: true, replace: true }
+    );
+  };
+
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      router.get(route('admin.users.index'), { search }, { preserveState: true, replace: true });
-    }, 400); // 400ms delay
+      router.get(
+        route('admin.users.index'),
+        { search, roles },
+        { preserveState: true, replace: true }
+      );
+    }, 400);
 
     return () => clearTimeout(delayDebounce);
   }, [search]);
@@ -39,12 +58,12 @@ export default function UsuariosIndex() {
 
   return (
     <Principal auth={auth}>
-            <FlashMessage message={flash.success} type="success" />
-            <FlashMessage message={flash.error} type="error" />
+      <FlashMessage message={flash.success} type="success" />
+      <FlashMessage message={flash.error} type="error" />
       <main className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Administrar Usuarios</h1>
 
-        <form onSubmit={(e) => e.preventDefault()} className="mb-4">
+        <form onSubmit={(e) => e.preventDefault()} className="mb-4 space-y-4">
           <input
             type="text"
             placeholder="Buscar por DNI..."
@@ -52,6 +71,27 @@ export default function UsuariosIndex() {
             onChange={(e) => setSearch(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full sm:w-1/2"
           />
+
+          <div className="flex gap-4">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={roles.includes('taxista')}
+                onChange={() => toggleRole('taxista')}
+                className="mr-2"
+              />
+              Taxista
+            </label>
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={roles.includes('cliente')}
+                onChange={() => toggleRole('cliente')}
+                className="mr-2"
+              />
+              Cliente
+            </label>
+          </div>
         </form>
 
         <table className="w-full border-collapse border border-gray-300">
@@ -74,7 +114,16 @@ export default function UsuariosIndex() {
                   <td className="border px-4 py-2">{user.email}</td>
                   <td className="border px-4 py-2">{user.dni}</td>
                   <td className="border px-4 py-2">
-                    {user.tipable_type?.includes('Taxista') ? 'Taxista' : 'Cliente'}
+                    {user.tipable_type?.includes('Taxista') ? (
+                      <Link
+                        href={route('admin.taxistas.show', user.id)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Taxista
+                      </Link>
+                    ) : (
+                      'Cliente'
+                    )}
                   </td>
                   <td className="border px-4 py-2">{user.is_admin ? 'Sí' : 'No'}</td>
                   <td className="border px-4 py-2 space-x-2">

@@ -123,11 +123,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/admin/usuarios', [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/taxistas/{user}', [UserController::class, 'showTaxista'])->name('admin.taxistas.show');
     Route::put('/admin/usuarios/{user}/togle-admin', [UserController::class, 'togleAdmin'])->name('admin.users.togle-admin');
     Route::delete('/admin/usuarios/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
-
-
 
 Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
 
