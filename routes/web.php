@@ -127,6 +127,8 @@ Route::middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::delete('/admin/usuarios/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
+
+
 Route::post('/contacto', [ContactoController::class, 'store'])->middleware('auth');
 
     

@@ -78,7 +78,7 @@ const Index = () => {
         {/* Tabla */}
         <div className="overflow-x-auto">
           <table className="w-full table-auto border-collapse border border-gray-300">
-            <thead className="bg-gray-100">
+            <thead className="bg-blue-500 text-white">
               <tr>
                 <th className="border px-4 py-2 text-left">Provincia</th>
                 <th className="border px-4 py-2 text-left">Precio por KM</th>
@@ -88,7 +88,7 @@ const Index = () => {
             </thead>
             <tbody>
               {provincias.data.map((provincia) => (
-                <tr key={provincia.id}>
+                <tr key={provincia.id} className="odd:bg-white even:bg-gray-200">
                   <td className="border px-4 py-2">{provincia.nombre}</td>
                   <td className="border px-4 py-2">
                     {editable && editingId === provincia.id ? (
