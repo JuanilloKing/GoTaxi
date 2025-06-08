@@ -212,7 +212,7 @@ class ReservaController extends Controller
             $reserva->estado_reservas_id = 4;
             $reserva->fecha_recogida = now();
             $reserva->save();
-    
+
             return back()->with('success', 'Reserva comenzada correctamente. [' . now()->timestamp . ']');
         }
     }
@@ -228,14 +228,14 @@ class ReservaController extends Controller
     
             
             $taxista = $reserva->taxista;
-    
+
             // Actualizar ubicación si está disponible
             if ($request->filled(['lat', 'lng'])) {
                 $taxista->lat = $request->lat;
                 $taxista->lng = $request->lng;
                 $taxista->ultima_actualizacion_localizacion = now();
             }
-    
+
             $taxista->estado_taxistas_id = 2;
             $taxista->vehiculo->disponible = true;
             $taxista->vehiculo->save();
