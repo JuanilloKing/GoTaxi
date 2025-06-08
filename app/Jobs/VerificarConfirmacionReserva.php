@@ -98,7 +98,7 @@ class VerificarConfirmacionReserva implements ShouldQueue
         $taxista->save();
 
 
-        // Re-despachar el job para ejecutar en 1 minuto
+        // Lanzar el job para ejecutar en 1 minuto
         self::dispatch($reserva->id)->delay(now()->addMinutes(1));
 
         // Enviar email al nuevo taxista

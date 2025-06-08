@@ -15,12 +15,12 @@ export default function UpdateProfileInformation({
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
             nombre: user.nombre,
-            apellidos: user.apellidos || '',  // Agregado para los apellidos
+            apellidos: user.apellidos || '',
             email: user.email,
-            dni: user.dni || '',  // Agregado para el DNI
-            telefono: user.telefono || '',  // Agregado para el teléfono
-            password: '',  // Agregado para la contraseña
-            password_confirmation: '',  // Confirmación de la contraseña
+            dni: user.dni || '',  
+            telefono: user.telefono || '',
+            password: '',  
+            password_confirmation: '',
         });
 
     const submit = (e) => {

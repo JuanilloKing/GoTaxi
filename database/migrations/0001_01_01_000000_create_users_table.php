@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('telefono')->unique();
             $table->string('password');
             $table->boolean('is_admin')->default(false);
-            $table->morphs('tipable'); // tipo de usuario [Cliente o taxista]
+            $table->morphs('tipable'); // [Cliente o taxista]
             $table->timestamps();
         });
 

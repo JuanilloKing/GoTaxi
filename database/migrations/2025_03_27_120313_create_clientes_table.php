@@ -30,10 +30,10 @@ return new class extends Migration
             'email' => 'admin@admin.com',
             'dni' => '12345678A',
             'telefono' => '123456789',
-            'password' => Hash::make('adminadmin'), // Cambiar contraseña por defecto
+            'password' => Hash::make('adminadmin'), // Contraseña por defecto
             'is_admin' => true,
             'tipable_type' => 'App\Models\Cliente',
-            'tipable_id' => $clienteId, // El ID del cliente recién insertado
+            'tipable_id' => $clienteId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -52,7 +52,7 @@ return new class extends Migration
             'password' => Hash::make('password'),
             'is_admin' => false,
             'tipable_type' => 'App\Models\Cliente',
-            'tipable_id' => $clienteId2, // El ID del cliente nuevo
+            'tipable_id' => $clienteId2,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

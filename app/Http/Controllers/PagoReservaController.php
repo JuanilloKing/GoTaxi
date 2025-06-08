@@ -102,7 +102,6 @@ class PagoReservaController extends Controller
         try {
             Refund::create([
                 'payment_intent' => $reserva->stripe_payment_intent_id,
-                // 'amount' => 1000, // opcional, si querés reembolsar parcial
             ]);
 
             $reserva->pagado = false;

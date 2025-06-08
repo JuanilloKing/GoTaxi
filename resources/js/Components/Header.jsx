@@ -29,7 +29,7 @@ useEffect(() => {
     });
   };  
 
-  // Intentar obtener permiso inicial
+  // Intentar obtener permiso de geolocalización
   navigator.geolocation.getCurrentPosition(
     () => {
       intervalId = setInterval(() => {
@@ -45,7 +45,6 @@ useEffect(() => {
       }, 3000);
     },
     (error) => {
-      console.error('🚫 Permiso de geolocalización denegado o fallido:', error);
     }
   );
 

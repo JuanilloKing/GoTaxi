@@ -61,7 +61,6 @@ export default function Edit({ taxista, vehiculo, usuario }) {
 
         const datosFiltrados = { ...data };
 
-        // Elimina campos vacíos innecesarios
         if (!data.password) {
             delete datosFiltrados.password;
             delete datosFiltrados.password_confirmation;

@@ -31,7 +31,7 @@ public function store(Request $request)
 {
     DB::beginTransaction();
     try {
-        // Validación de los datos con mensajes personalizados
+
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
@@ -99,7 +99,7 @@ public function store(Request $request)
         $message = 'Error al registrar el usuario.';
         $errorMsg = $e->getMessage();
 
-        // Detectar claves únicas violadas (depende del motor de BD)
+
         if (str_contains($errorMsg, 'vehiculos_licencia_taxi_unique')) {
             $message = 'Licencia de taxi ya registrada.';
         } elseif (str_contains($errorMsg, 'vehiculos_matricula_unique')) {
@@ -178,7 +178,6 @@ public function store(Request $request)
             return redirect()->route('home')->with('error', 'No tienes acceso a esta página.');
         }
     
-        // Validaciones
         $validated = $request->validate([
             'nombre' => 'sometimes|nullable|string|max:255',
             'apellidos' => 'sometimes|nullable|string|max:255',
@@ -188,7 +187,7 @@ public function store(Request $request)
             'password' => 'sometimes|nullable|string|min:8|confirmed',
             'municipio_id' => 'sometimes|nullable|string|max:255',
         ]);
-        // Actualizar campos del usuario
+
         if (isset($validated['nombre'])) $user->nombre = $validated['nombre'];
         if (isset($validated['apellidos'])) $user->apellidos = $validated['apellidos'];
         if (isset($validated['email'])) $user->email = $validated['email'];
@@ -198,7 +197,6 @@ public function store(Request $request)
 
         $user->save();
 
-        // Actualizar campos del modelo relacionado (taxista)
         if (isset($validated['municipio_id'])) {
             $taxista->municipio = $validated['municipio_id'];
             $taxista->save();

@@ -54,7 +54,7 @@ class ReservaController extends Controller
         $latOrigen = $request->lat_origen;
         $lonOrigen = $request->lon_origen;
         
-        // Lógica de geolocalización para el origen
+        // Llamar a la API de Geoapify
         $client = new Client();
         $geoapifyApiKey = '3b3471c7f4ec44afa8588b257cc362d8';
         $url = "https://api.geoapify.com/v1/geocode/reverse?lat=$latOrigen&lon=$lonOrigen&apiKey=$geoapifyApiKey";

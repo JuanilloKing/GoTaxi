@@ -28,7 +28,7 @@ public function index(Request $request)
 
     $query->orderBy('provincias.provincia', $sort);
 
-    $provincias = $query->paginate(10)->withQueryString(); // 10 por página
+    $provincias = $query->paginate(10)->withQueryString();
 
     return Inertia::render('Admin/Tarifa/Index', [
         'provincias' => $provincias,

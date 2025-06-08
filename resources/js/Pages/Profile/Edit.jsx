@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import Header from '@/Components/Header'; // Importa el nuevo Header
+import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 
 export default function Edit({ mustVerifyEmail, status }) {

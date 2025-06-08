@@ -78,7 +78,7 @@ const Create = () => {
             if (status === 'OK') {
               resolve(result);
             } else {
-              reject(status); // Captura errores como ZERO_RESULTS
+              reject(status);
             }
           }
         );
@@ -123,7 +123,6 @@ const Create = () => {
     } catch (errorStatus) {
       console.error('Error al calcular ruta:', errorStatus);
 
-      // 🔔 Aquí defines qué hacer en cada error
       if (errorStatus === 'ZERO_RESULTS') {
         alert('No se pudo encontrar una ruta entre el origen y destino.');
       } else {

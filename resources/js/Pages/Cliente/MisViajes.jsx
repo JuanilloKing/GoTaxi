@@ -22,7 +22,7 @@ const cancelarReserva = (id) => {
       '⚠️ Este servicio ya ha sido abonado. ¿Estás seguro de que deseas cancelar? Serás redirigido para solicitar una devolución.'
     );
     if (confirmar) {
-      router.get(route('pago.reembolso.mostrar', id)); // ruta que te llevará al proceso de devolución
+      router.get(route('pago.reembolso.mostrar', id)); // ruta de reembolso
     }
   } else {
     if (confirm('¿Estás seguro de que quieres finalizar este servicio?')) {
@@ -70,7 +70,6 @@ useEffect(() => {
           }
         );
 
-        // Calcular minutos desde última actualización
         if (reservaActiva.taxista.ultima_actualizacion_ubicacion) {
           const updatedAt = new Date(reservaActiva.taxista.ultima_actualizacion_ubicacion);
           const ahora = new Date();

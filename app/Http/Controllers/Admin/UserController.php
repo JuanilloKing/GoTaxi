@@ -25,7 +25,7 @@ class UserController extends Controller
                         $q->orWhere('tipable_type', 'LIKE', '%Taxista');
                     }
                     if (in_array('cliente', $roles)) {
-                        $q->orWhereNull('tipable_type') // o ajustá según tu base
+                        $q->orWhereNull('tipable_type')
                         ->orWhere('tipable_type', 'LIKE', '%Cliente');
                     }
                 });
@@ -49,10 +49,8 @@ class UserController extends Controller
             abort(404, 'No es un taxista válido');
         }
 
-        // Cargar relación estado_taxistas
         $taxista = $user->tipable()->with('estado_taxistas')->first();
 
-        // Reservas con valoraciones, paginadas
         $reservas = $taxista
             ->reservas()
             ->whereHas('valoracion')

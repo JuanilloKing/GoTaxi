@@ -89,7 +89,6 @@ export default function Show({ auth, taxista, reservaActiva: initialReservaActiv
           realizarPost(latitude, longitude);
         },
         () => {
-          // No mostramos alerta, simplemente hacemos el post sin ubicación
           realizarPost();
         },
         { enableHighAccuracy: true }
