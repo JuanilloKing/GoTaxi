@@ -1,66 +1,96 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GoTaxi
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🧾 Índice
+1. [Introducción: ¿Qué es GoTaxi?](#-introducción-qué-es-gotaxi)
+2. [Requisitos e Instalación](#️-requisitos-e-instalación)
+3. [Configuración del Entorno](#-configuración-del-entorno)
+4. [Migraciones y Seeders](#️-migraciones-y-seeders)
+5. [Configuración de Colas (Queue)](#-configuración-de-colas-queue)
+6. [Credenciales de Prueba](#-credenciales-de-prueba)
+7. [Contacto](#-contacto)
 
-## About Laravel
+## 1. Introducción: ¿Qué es GoTaxi?
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**GoTaxi** es una plataforma moderna desarrollada en Laravel para gestionar clientes con taxistas de manera rápida, ordenada y eficiente.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El proyecto cuenta con:
+- Panel de administración para gestionar y editar usuarios y tarifas.
+- Interfaz de cliente para hacer reservas de taxi de manera sencilla, pudiendo elegir calles, lugares emblemanticos o tiendas que tengas cerca para pedir el servicio.
+- Sistema de taxistas con lógica de aceptación/rechazo de reservas en tiempo real.
+- Notificaciones automáticas y sistema de colas.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 2. Requisitos e Instalación
 
-## Learning Laravel
+Antes de ejecutar GoTaxi, asegúrate de tener instalados:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Requisitos:
+- [PHP 8.1+](https://www.php.net/)
+- [Composer](https://getcomposer.org/)
+- [Node.js & NPM](https://nodejs.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
+- Laravel Queues (configurado con supervisor o `php artisan queue:work`)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Clona el repositorio:
+```bash
+git clone https://github.com/tuusuario/gotaxi.git
+cd gotaxi
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Instala las dependencias:
+```bash
+composer install
+npm install && npm run dev
+```
 
-## Laravel Sponsors
+## 3. Configuración del Entorno
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+cp .env.example .env
+```
 
-### Premium Partners
+Edita el `.env`:
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=gotaxi
+DB_USERNAME=gotaxi
+DB_PASSWORD=gotaxi
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+php artisan key:generate
+```
 
-## Contributing
+## 4. Migraciones y Seeders
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan migrate --seed
+```
 
-## Code of Conduct
+## 5. Configuración de Colas (Queue)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan queue:work
+```
 
-## Security Vulnerabilities
+En producción, usa `Supervisor` para mantener el worker activo.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 6. Credenciales de Prueba
 
-## License
+### Administrador:
+- **Email:** `admin@admin`
+- **Contraseña:** `adminadmin`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Clientes:
+- `manuel@example.com` / `password`
+
+### Taxistas:
+- `juan@example.com` / `password`
+- `maria@example.com` / `password`
+- `pedro@example.com` / `password`
+
+## 7.Contacto
+
+Abre un issue o contacta conmigo al siguiente correo: eduardo.sumariva@iesdonana.org
