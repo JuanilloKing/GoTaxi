@@ -71,7 +71,7 @@ const Index = () => {
             onClick={handleSortToggle}
             className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
           >
-            Ordenar {sortAsc ? 'A-Z' : 'Z-A'}
+            Ordenar {sortAsc ? 'Z-A' : 'A-Z'}
           </button>
         </div>
 

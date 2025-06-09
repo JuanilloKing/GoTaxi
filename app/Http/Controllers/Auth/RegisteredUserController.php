@@ -54,11 +54,10 @@ class RegisteredUserController extends Controller
             $user->email = $validated['email'];
             $user->password = Hash::make($validated['password']);
             // Asignar el ID del usuario al campo tipable_id
-                // Crear el cliente
                 $cliente = new Cliente();
                 $cliente->save();
                 $user->tipable()->associate($cliente);
-            $user->save();  // Guardar la relación
+            $user->save();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error al registrar el usuario: ' . $e->getMessage());

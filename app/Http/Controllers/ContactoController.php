@@ -11,7 +11,7 @@ class ContactoController extends Controller
 
     public function index()
     {
-        $contactos = Contacto::latest()->paginate(10);
+        $contactos = Contacto::with('user')->latest()->paginate(10);
 
         return Inertia::render('Admin/Mensajes/Index', [
             'contactos' => $contactos,

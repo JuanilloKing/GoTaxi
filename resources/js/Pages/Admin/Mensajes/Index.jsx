@@ -12,15 +12,29 @@ export default function Index() {
       <div className="p-6 max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Mensajes de contacto</h1>
 
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          {contactos.data.map((contacto) => (
-            <div key={contacto.id} className="border-b px-4 py-3">
-              <div className="font-semibold">{contacto.asunto}</div>
-              <div className="text-sm text-gray-600">{contacto.mensaje}</div>
-              <div className="text-xs text-gray-400 mt-1">Enviado el {new Date(contacto.created_at).toLocaleString()}</div>
-            </div>
-          ))}
-        </div>
+<div className="bg-white shadow rounded-lg p-4 space-y-6">
+  {contactos.data.map((contacto) => (
+    <div key={contacto.id} className="p-4 border border-black border-gray-300 rounded">
+      
+      {/* Datos del remitente */}
+      <div className="bg-gray-100 p-4 rounded mb-3">
+        <p className="text-sm text-gray-700"><strong>Nombre:</strong> {contacto.user?.nombre}</p>
+        <p className="text-sm text-gray-700"><strong>Email:</strong> {contacto.user?.email}</p>
+        <p className="text-sm text-gray-700"><strong>Teléfono:</strong> {contacto.user?.telefono}</p>
+      </div>
+
+      {/* Contenido del mensaje */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">{contacto.asunto}</h3>
+        <p className="text-gray-600 text-sm">{contacto.mensaje}</p>
+        <p className="text-xs text-gray-400 mt-2">
+          Enviado el {new Date(contacto.created_at).toLocaleString()}
+        </p>
+      </div>
+
+    </div>
+  ))}
+</div>
 
         {/* Paginación */}
         <div className="flex justify-center mt-6 space-x-2">

@@ -253,7 +253,7 @@ class ReservaController extends Controller
             return redirect()->back()->with('error', 'No se puede cancelar reservas en curso o ya finalizadas. [' . now()->timestamp . ']');
         }
         else {
-            VerificarConfirmacionReserva::dispatch($reserva->id);
+            VerificarConfirmacionReserva::dispatch($reserva->id)->delay(now());
             return redirect()->back()->with('success', 'Reserva cancelada correctamente. [' . now()->timestamp . ']');
         }
     }

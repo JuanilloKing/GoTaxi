@@ -26,9 +26,9 @@ class TarifaController extends Controller
                 DB::raw('COALESCE(tarifas.precio_hora, 0.2) as precio_hora')
             )
             ->when($search, function ($query, $search) {
-                $query->where('provincias.provincia', 'LIKE', $search . '%');
+                $query->where('provincias.provincia', 'ILIKE', $search . '%');
             })
-            ->orderBy('provincias.provincia', $sort)
+            ->orderByRaw("TRANSLATE(provincias.provincia, 'Á', 'A') $sort")
             ->paginate(15)
             ->withQueryString();
 

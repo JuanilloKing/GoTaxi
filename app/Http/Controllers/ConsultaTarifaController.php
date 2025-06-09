@@ -26,7 +26,7 @@ public function index(Request $request)
         $query->where('provincias.provincia', 'ILIKE', $search . '%');
     }
 
-    $query->orderBy('provincias.provincia', $sort);
+    $query->orderByRaw("TRANSLATE(provincias.provincia, 'Á', 'A') $sort");
 
     $provincias = $query->paginate(10)->withQueryString();
 

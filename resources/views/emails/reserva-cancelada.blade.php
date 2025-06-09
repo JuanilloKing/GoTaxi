@@ -20,6 +20,7 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .header {
+            text-align: center;
             background-color: #EB5757;
             color: white;
             padding: 20px;
@@ -34,6 +35,12 @@
             padding: 15px;
             text-align: center;
             font-size: 12px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
         }
         .button {
             display: inline-block;
@@ -51,14 +58,13 @@
 </head>
 <body>
     <div class="email-container">
-        <div class="header text-center">
+        <div class="header">
             <h1>Tu reserva ha sido cancelada</h1>
         </div>
 
         <div class="body">
             <p>Hola <strong>{{ $reserva->cliente->user->nombre }}</strong>,</p>
             <p>Lamentablemente no hemos podido encontrar un taxista disponible para tu reserva.</p>
-
             <p>Detalles de tu intento de reserva:</p>
             <ul>
                 <li><strong>Origen:</strong> {{ $reserva->origen }}</li>
@@ -68,6 +74,8 @@
             </ul>
 
             <p>Te invitamos a volver a intentarlo más tarde. Sentimos mucho los inconvenientes ocasionados.</p>
+
+            <a href="{{ url('/') }}" class="button">Volver a la plataforma</a>
         </div>
 
         <div class="footer">
