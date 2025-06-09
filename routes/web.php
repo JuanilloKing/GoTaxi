@@ -102,6 +102,7 @@ Route::post('/taxista/cambiar-estado', [TaxistaController::class, 'cambiarEstado
 Route::get('/api/provincias', [LocationController::class, 'getProvincias']);
 Route::get('/api/municipios/{provinciaId}', [LocationController::class, 'getMunicipios']);
 
+
     // Rutas de admin
 Route::get('/admin/tarifas', [TarifaController::class, 'index'])
     ->name('tarifas.index')

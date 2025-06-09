@@ -8,40 +8,52 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Reserva;
 use Illuminate\Support\Facades\DB;
+use App\Models\Taxista;
+use App\Models\Cliente;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->input('search');
-        $roles = $request->input('roles', []);
 
-        $users = User::when($search, fn($q) =>
-                $q->where('dni', 'ILIKE', "{$search}%")
-            )
-            ->when(!empty($roles), function ($query) use ($roles) {
-                $query->where(function ($q) use ($roles) {
-                    if (in_array('taxista', $roles)) {
-                        $q->orWhere('tipable_type', 'LIKE', '%Taxista');
-                    }
-                    if (in_array('cliente', $roles)) {
-                        $q->orWhereNull('tipable_type')
-                        ->orWhere('tipable_type', 'LIKE', '%Cliente');
-                    }
-                });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
+public function index(Request $request)
+{
+    $search = $request->input('search');
+    $roles = $request->input('roles', []);
+    $municipioId = $request->input('municipio_id');
 
-        return Inertia::render('Admin/Usuarios/Index', [
-            'users' => $users,
-            'filters' => [
-                'search' => $search,
-                'roles' => $roles,
-            ],
-        ]);
-    }
+    $users = User::query()
+        ->when($search, fn($q) =>
+            $q->where('dni', 'ILIKE', "{$search}%")
+        )
+        ->when(!empty($roles), function ($q) use ($roles) {
+            $q->where(function ($q) use ($roles) {
+                foreach ($roles as $role) {
+                    if ($role === 'taxista') {
+                        $q->orWhere('tipable_type', Taxista::class);
+                    }
+                    if ($role === 'cliente') {
+                        $q->orWhere('tipable_type', Cliente::class);
+                    }
+                }
+            });
+        })
+        ->when($municipioId, function ($q) use ($municipioId) {
+            $q->whereHasMorph('tipable', [Taxista::class], function ($q) use ($municipioId) {
+                $q->where('municipio_id', $municipioId);
+            });
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('Admin/Usuarios/Index', [
+        'users' => $users,
+        'filters' => [
+            'search' => $search,
+            'roles' => $roles,
+            'municipio_id' => $municipioId,
+        ],
+    ]);
+}
 
     public function showTaxista(User $user, Request $request)
     {
